@@ -1,0 +1,160 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <style>
+    body { margin: 0; padding: 0; background: transparent; }
+    .scroll-container {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: "楷体", "KaiTi", serif;
+      margin: 8px 0;
+    }
+    .scroll-header {
+      background: linear-gradient(90deg, #2b3a32, #3b5245, #2b3a32);
+      color: #e6cd8e;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #4a5d45;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      <<<user>>>-select: none;
+    }
+    .scroll-header:hover {
+      filter: brightness(1.1);
+    }
+    .scroll-title {
+      font-size: 1em;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    .scroll-icon {
+      font-size: 1.1em;
+      transition: transform 0.3s ease;
+      color: #8b9c76;
+    }
+    .scroll-icon.open {
+      transform: rotate(180deg);
+      color: #e6cd8e;
+    }
+    .scroll-content {
+      display: none;
+      background-color: #f6f4eb; /* 清透纸张色 */
+      border: 1px solid #7c8f65;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      padding: 15px;
+      color: #2b3a32;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(124,143,101,0.15) 24px, rgba(124,143,101,0.15) 25px); /* 信纸横线 */
+      position: relative;
+    }
+    .seal-stamp {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: rgba(140, 42, 42, 0.4);
+      border: 2px solid rgba(140, 42, 42, 0.4);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 1em;
+      font-weight: bold;
+      transform: rotate(-10deg);
+      pointer-events: none;
+    }
+    .scroll-content p {
+      margin: 0 0 12px 0;
+      line-height: 25px; /* 匹配横线间距 */
+      font-size: 0.95em;
+    }
+    .loading {
+      text-align: center;
+      color: #7c8f65;
+      font-style: italic;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-container">
+    <div class="scroll-header" id="toggle-btn">
+      <span class="scroll-title">📜 天机推演卷宗（点击展开）</span>
+      <span class="scroll-icon" id="toggle-icon">▼</span>
+    </div>
+    <div class="scroll-content" id="content">
+      <div class="loading">正在解读天机...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    function getMessageData() {
+      var chatMessages = getChatMessages(getCurrentMessageId());
+      if (!chatMessages || chatMessages.length === 0) return null;
+      return chatMessages[0].message;
+    }
+
+    function extractContent(messageText) {
+      var match = messageText.match(/<story_driver>([\s\S]*?)<\/story_driver>/);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+      return "";
+    }
+
+    function renderPage(text) {
+      var html = '<div class="seal-stamp">天机绝密</div>';
+      if (!text) {
+        html += '<p>天机混沌，暂无推演记录。</p>';
+      } else {
+        var lines = text.split('\n');
+        lines.forEach(function(line) {
+          var trimmed = line.trim();
+          if (trimmed) {
+            if (trimmed.startsWith('━━')) {
+              html += '<p style="font-weight:bold; color:#4a5d45; margin-top:15px; border-bottom:1px dashed #7c8f65; padding-bottom:2px;">' + trimmed + '</p>';
+            } else if (trimmed.startsWith('[')) {
+              var closeBracketIdx = trimmed.indexOf(']');
+              if(closeBracketIdx !== -1) {
+                var label = trimmed.substring(0, closeBracketIdx + 1);
+                var content = trimmed.substring(closeBracketIdx + 1);
+                html += '<p style="color:#2b3a32;"><span style="color:#7c8f65; font-weight:bold; margin-right:4px;">' + label + '</span>' + content + '</p>';
+              } else {
+                html += '<p>' + trimmed + '</p>';
+              }
+            } else {
+              html += '<p>' + trimmed + '</p>';
+            }
+          }
+        });
+      }
+      jQuery('#content').html(html);
+    }
+
+    function init() {
+      try {
+        var messageText = getMessageData();
+        if (!messageText) {
+          jQuery('#content').html('<div class="loading">❌ 无法获取天机卷宗</div>');
+          return;
+        }
+        var text = extractContent(messageText);
+        renderPage(text);
+
+        /* 绑定折叠事件 */
+        jQuery('#toggle-btn').off('click').on('click', function() {
+          jQuery('#content').slideToggle(250);
+          jQuery('#toggle-icon').toggleClass('open');
+        });
+      } catch (error) {
+        console.error("错误:", error);
+        jQuery('#content').html('<div class="loading">❌ 卷宗损毁：' + error.message + '</div>');
+      }
+    }
+
+    jQuery(function() { init(); });
+  </script>
+</body>
+</html>

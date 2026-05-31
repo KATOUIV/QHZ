@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: transparent;
+            padding: 15px 5px;
+            font-family: "KaiTi", "楷体", serif;
+        }
+
+        /* 外部容器：充当告示板的底托，深沉的木棕色和木纹叠加 */
+        .bounty-card {
+            max-width: 650px;
+            margin: 0 auto;
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px),
+                linear-gradient(135deg, #4a3424 0%, #3a2517 100%);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow:
+                0 15px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 核心纸张：深竹青色 + 奏折折痕 + 四角向内凹陷 */
+        .bounty-paper {
+            background-color: #8ca896;
+            background-image:
+                linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.06) 25%, transparent 26%),
+                linear-gradient(90deg, transparent 49%, rgba(0,0,0,0.08) 50%, transparent 51%),
+                linear-gradient(90deg, transparent 74%, rgba(0,0,0,0.06) 75%, transparent 76%),
+                radial-gradient(circle at 80% 20%, rgba(100, 130, 110, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(90, 120, 100, 0.2) 0%, transparent 50%);
+
+            padding: 35px 28px 45px;
+            min-height: 250px;
+            position: relative;
+            z-index: 2;
+
+            --mask-radius: 18px;
+            -webkit-mask:
+                radial-gradient(circle at top left, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) top left,
+                radial-gradient(circle at top right, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) top right,
+                radial-gradient(circle at bottom left, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) bottom left,
+                radial-gradient(circle at bottom right, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) bottom right;
+            -webkit-mask-size: 51% 51%;
+            -webkit-mask-repeat: no-repeat;
+
+            mask:
+                radial-gradient(circle at top left, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) top left,
+                radial-gradient(circle at top right, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) top right,
+                radial-gradient(circle at bottom left, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) bottom left,
+                radial-gradient(circle at bottom right, transparent var(--mask-radius), black calc(var(--mask-radius) + 0.5px)) bottom right;
+            mask-size: 51% 51%;
+            mask-repeat: no-repeat;
+        }
+
+        .bounty-paper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 动态特效：微风竹影遮罩 */
+        .bounty-flicker {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+            z-index: 10;
+            animation: windBlow 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes windBlow {
+            0% { opacity: 0.7; transform: translateX(-1%); }
+            100% { opacity: 1; transform: translateX(1%); }
+        }
+
+        /* 标题区域 */
+        .bounty-header {
+            text-align: center;
+            border-bottom: 2px dashed #5c7a68;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .bounty-title {
+            color: #d4af37;
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-shadow: 1px 1px 0 #5c4911, 2px 2px 5px rgba(0,0,0,0.6);
+            margin-bottom: 5px;
+        }
+
+        .bounty-subtitle {
+            font-size: 13px;
+            color: #d4af37;
+            letter-spacing: 4px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .bounty-content {
+            color: #111111;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* 专门针对卷宗结构的排版 */
+        .record-box {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid #5c7a68;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+        }
+
+        .record-time {
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 1px solid #5c7a68;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2b1f14;
+        }
+
+        .record-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .score-item {
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.05);
+            border-left: 4px solid #d4af37;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .record-result {
+            font-weight: 900;
+            font-size: 18px;
+            color: #9e3232;
+            text-align: center;
+            padding: 12px;
+            background: rgba(158, 50, 50, 0.1);
+            border: 2px dashed #9e3232;
+        }
+
+        .normal-text {
+            font-size: 15px;
+            line-height: 1.8;
+            text-indent: 2em;
+            text-align: justify;
+        }
+
+        /* 动态印章特效 */
+        .bounty-seal {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            width: clamp(80px, 22vw, 100px);
+            height: clamp(80px, 22vw, 100px);
+            border: 3px solid rgba(160, 40, 40, 0.5);
+            border-radius: 50%;
+            color: rgba(160, 40, 40, 0.55);
+            font-size: clamp(16px, 4.5vw, 22px);
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.1;
+            transform: rotate(-20deg);
+            z-index: 4;
+            pointer-events: none;
+            box-shadow: inset 0 0 10px rgba(160, 40, 40, 0.15);
+            animation: stampIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes stampIn {
+            0% { transform: scale(3) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(0.9) rotate(-20deg); opacity: 1; }
+            70% { transform: scale(1.05) rotate(-20deg); opacity: 0.9; }
+            100% { transform: scale(1) rotate(-20deg); opacity: 0.8; }
+        }
+
+        .bounty-seal-small {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(140, 50, 50, 0.4);
+            color: rgba(140, 50, 50, 0.4);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transform: rotate(10deg);
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #5c7a68;
+            padding: 30px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="bounty-card">
+        <div class="bounty-paper">
+            <div class="bounty-flicker"></div>
+            <div class="bounty-seal-small">天机<br>密录</div>
+            <div class="bounty-header">
+                <div class="bounty-title">天机密录</div>
+                <div class="bounty-subtitle">· 绝密卷宗 ·</div>
+            </div>
+            <div id="mq-content" class="bounty-content">
+                <div class="loading-text">卷宗解析中...</div>
+            </div>
+            <div class="bounty-seal">夜勘<br>定案</div>
+        </div>
+    </div>
+
+    <script>
+        function getMessageData() {
+            try {
+                var chatMessages = getChatMessages(getCurrentMessageId());
+                if (!chatMessages || chatMessages.length === 0) return null;
+                return chatMessages[0].message;
+            } catch (e) {
+                console.error("获取消息失败:", e);
+                return null;
+            }
+        }
+
+        function extractContent(text) {
+            /* 严格匹配 <天机> 标签内的内容，去除两端空白 */
+            var match = text.match(/<天机>\s*([\s\S]*?)\s*<\/天机>/);
+            return match && match[1] ? match[1].trim() : "";
+        }
+
+        function renderContent(text) {
+            var contentDiv = document.getElementById('mq-content');
+
+            if (!text) {
+                contentDiv.innerHTML = '<p class="loading-text">未查阅到卷宗数据或格式错误。</p>';
+                return;
+            }
+
+            /* 规范规定 <天机> 内仅有一行格式化的数据：时间 | 甲方得分 | 乙方得分 | 结果 */
+            var parts = text.split('|').map(function(item) { return item.trim(); });
+
+            if (parts.length >= 4) {
+                var html = '<div class="record-box">';
+                html += '  <div class="record-time">案发时间：' + parts[0] + '</div>';
+                html += '  <div class="record-scores">';
+                html += '    <div class="score-item">【甲方定数】' + parts[1] + '</div>';
+                html += '    <div class="score-item">【乙方定数】' + parts[2] + '</div>';
+                html += '  </div>';
+                html += '  <div class="record-result">【勘定结论】' + parts[3] + '</div>';
+                html += '</div>';
+                contentDiv.innerHTML = html;
+            } else {
+                /* 兜底：如果格式不对，原样输出 */
+                contentDiv.innerHTML = '<p class="normal-text">' + text + '</p>';
+            }
+        }
+
+        function init() {
+            var messageText = getMessageData();
+            if (messageText) {
+                var content = extractContent(messageText);
+                renderContent(content);
+            } else {
+                document.getElementById('mq-content').innerHTML = '<p class="loading-text">密卷损毁，无法查阅。</p>';
+            }
+        }
+
+        $(function() {
+            init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1750 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="preload" as="image" href="https://files.catbox.moe/fcllss.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: transparent;
+      --bg-modal: transparent;
+      --bg-card: rgba(255, 255, 255, 0.07);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --glass-surface: rgba(255, 255, 255, 0.06);
+      --glass-surface-strong: rgba(255, 255, 255, 0.1);
+      --glass-blur: blur(20px) saturate(1.45);
+      --glass-blur-strong: blur(28px) saturate(1.55);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      --accent-red: #e63b3b;
+      --accent-red-dark: #8b1a1a;
+      --accent-gold: #f0c040;
+      --accent-cyan: #40c4e6;
+      --text-primary: #f0e6d3;
+      --text-secondary: #a09b8c;
+      --text-muted: #5c5748;
+      --font-display: 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'STKaiti', 'KaiTi', cursive;
+      --font-serif: 'ZCOOL XiaoWei', 'Noto Serif SC', 'STKaiti', 'KaiTi', serif;
+      --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --rgb-flow: linear-gradient(90deg, #f0c040 0%, #ff6b6b 22%, #c084fc 44%, #4ecdc4 66%, #f0c040 88%, #ff6b6b 100%);
+      --rgb-flow-soft: linear-gradient(90deg, rgba(240,192,64,0.95) 0%, rgba(255,107,107,0.95) 25%, rgba(167,139,250,0.95) 50%, rgba(78,205,196,0.95) 75%, rgba(240,192,64,0.95) 100%);
+      --mvu-bg-image: url('https://files.catbox.moe/fcllss.jpg');
+    }
+
+    /* ========== RGB 流动文字 ========== */
+    .text-rgb-flow {
+      background: var(--rgb-flow);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbTextFlow 7s linear infinite;
+    }
+    .text-rgb-flow-soft {
+      background: var(--rgb-flow-soft);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbTextFlow 9s linear infinite;
+    }
+    @keyframes rgbTextFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 320% 50%; }
+    }
+
+    /* ========== 动态渐变填充条 ========== */
+    @keyframes barGradientFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .bar-hp .bar-fill,
+    #hp-fill.bar-fill.hp-healthy {
+      background-image: linear-gradient(90deg, #6b1515, #e63b3b, #ff6b6b, #f0c040, #e63b3b, #6b1515);
+    }
+    #hp-fill.bar-fill.hp-warn {
+      background-image: linear-gradient(90deg, #6b4a10, #ffaa00, #ffd666, #ff6b6b, #ffaa00, #6b4a10);
+    }
+    #hp-fill.bar-fill.hp-critical {
+      background-image: linear-gradient(90deg, #4a0a0a, #ff3333, #ff6b6b, #c084fc, #ff3333, #4a0a0a);
+      animation-duration: 3.5s;
+    }
+    .bar-sp .bar-fill,
+    #sp-fill.bar-fill {
+      background-image: linear-gradient(90deg, #0f4a5c, #40c4e6, #4ecdc4, #a78bfa, #40c4e6, #0f4a5c);
+      animation-duration: 4.5s;
+    }
+    .mini-fill.fill-love {
+      background-image: linear-gradient(90deg, #6b1535, #ff4d8d, #ff6b6b, #f0c040, #ff4d8d, #6b1535);
+    }
+    .mini-fill.fill-trust {
+      background-image: linear-gradient(90deg, #0f4545, #40e6d4, #4ecdc4, #a78bfa, #40e6d4, #0f4545);
+      animation-duration: 5s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .text-rgb-flow, .text-rgb-flow-soft, .kn-title, .kn-watermark,
+      .bar-fill, .mini-fill, .sidebar-btn.active span {
+        animation: none !important;
+      }
+      .text-rgb-flow, .text-rgb-flow-soft, .kn-title, .kn-watermark, .sidebar-btn.active span {
+        -webkit-text-fill-color: var(--text-primary);
+        background: none;
+        color: var(--accent-gold);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      font-family: var(--font-sans);
+      background: transparent;
+      color: var(--text-primary);
+      line-height: 1.6;
+      height: auto;
+      min-height: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    html.mvu-folded, html.mvu-folded body,
+    body.mvu-folded {
+      overflow: visible;
+      height: fit-content;
+      min-height: 0;
+    }
+    html.mvu-expanded, html.mvu-expanded body,
+    body.mvu-expanded {
+      overflow: hidden;
+      height: auto;
+      min-height: 0;
+    }
+    body.mvu-expanded #mvu-collapsed {
+      display: none;
+    }
+
+    /* ========== 收起状态：剑 + 标题 + 水印 + 底层背景 ========== */
+    #mvu-collapsed {
+      position: relative;
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      height: auto;
+      min-height: 0;
+      padding: 0;
+      z-index: 9998;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      isolation: isolate;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      user-select: none;
+    }
+    #mvu-collapsed-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    #mvu-collapsed-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      display: block;
+      transform: scale(1.04);
+      filter: saturate(1.08) contrast(1.04);
+    }
+    #mvu-collapsed-bg .mvu-bg-veil--compact {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(8, 8, 16, 0.05) 0%,
+        rgba(8, 8, 16, 0.12) 100%
+      );
+      pointer-events: none;
+    }
+    .mvu-collapsed-front {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 6px 12px 14px;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(10px) saturate(1.4);
+      -webkit-backdrop-filter: blur(10px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: inherit;
+      box-shadow: var(--glass-inset);
+    }
+    .mvu-collapsed-front .kn-title {
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+    }
+    .mvu-collapsed-front .kn-watermark {
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 5px rgba(192, 132, 252, 0.2));
+    }
+    #mvu-collapsed:hover .sword-wrap svg {
+      filter: drop-shadow(0 0 10px rgba(230,59,59,0.75));
+    }
+    #mvu-collapsed:active {
+      transform: scale(0.92);
+    }
+
+    /* 剑容器 */
+    .sword-wrap {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sword-wrap svg {
+      width: 28px;
+      height: 28px;
+      filter: drop-shadow(0 0 3px rgba(230,59,59,0.4));
+      animation: swordGlow 2.5s ease-in-out infinite;
+    }
+    @keyframes swordGlow {
+      0%, 100% { filter: drop-shadow(0 0 3px rgba(230,59,59,0.3)); }
+      50% { filter: drop-shadow(0 0 8px rgba(230,59,59,0.7)); }
+    }
+
+    /* 浪波纹 — 圆环扩散 */
+    .sword-wrap::before, .sword-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      animation: rippleWave 2.5s linear infinite;
+      pointer-events: none;
+    }
+    .sword-wrap::after {
+      animation-delay: 1.25s;
+      border-color: rgba(230, 59, 59, 0.2);
+    }
+    @keyframes rippleWave {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* 炫彩艺术字 */
+    .kn-title {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      background: var(--rgb-flow);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbTextFlow 6s linear infinite;
+      white-space: nowrap;
+      filter: drop-shadow(0 0 8px rgba(240, 192, 64, 0.15));
+    }
+
+    /* 水印 — 艺术字炫彩 */
+    .kn-watermark {
+      position: absolute;
+      bottom: 1px;
+      right: 8px;
+      font-size: 9px;
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+      background: var(--rgb-flow-soft);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbTextFlow 10s linear infinite;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 4px rgba(240, 192, 64, 0.15));
+    }
+
+    /* ========== 展开层：透明底、高度随 tab 内容 ========== */
+    #mvu-overlay {
+      position: relative;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+    #mvu-overlay.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ========== 模态框：全宽纵向布局 + 底层背景图 ========== */
+    #mvu-modal {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      height: auto;
+      max-height: var(--mvu-modal-max, 72vh);
+      background: transparent;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: hidden;
+      transform: none;
+      transition: opacity 0.25s ease;
+      box-shadow: none;
+      border: none;
+      isolation: isolate;
+      --glass-surface: rgba(255, 255, 255, 0.1);
+      --glass-surface-strong: rgba(255, 255, 255, 0.14);
+      --glass-blur: blur(16px) saturate(1.55);
+      --glass-blur-strong: blur(22px) saturate(1.6);
+    }
+    #mvu-overlay.active #mvu-modal {
+      transform: none;
+    }
+
+    #mvu-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    #mvu-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      display: block;
+      transform: scale(1.02);
+      filter: saturate(1.08) contrast(1.04);
+    }
+    #mvu-bg .mvu-bg-veil {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(8, 8, 16, 0.04) 0%,
+        rgba(8, 8, 16, 0.1) 45%,
+        rgba(8, 8, 16, 0.2) 100%
+      );
+      pointer-events: none;
+    }
+
+    #mvu-header,
+    #mvu-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    #mvu-content,
+    #mvu-header,
+    #mvu-header .sidebar-btn span {
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.42);
+    }
+    .stat-label,
+    .stat-value:not(.text-rgb-flow-soft):not(.text-flow-gold):not(.text-flow-cyan):not(.text-flow-red),
+    .world-item-label,
+    .world-item-value,
+    .record-label,
+    .empty-state,
+    .aff-label,
+    .aff-num,
+    .aff-change {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 顶栏：Tab + 关闭 */
+    #mvu-header {
+      position: relative;
+      flex-shrink: 0;
+      width: 100%;
+      background: var(--glass-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border-glass);
+      box-shadow: var(--glass-inset);
+    }
+
+    /* 关闭按钮 */
+    #mvu-close {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px) saturate(1.3);
+      -webkit-backdrop-filter: blur(12px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 12;
+      transition: all 0.2s ease;
+    }
+    #mvu-close:hover { background: rgba(230,59,59,0.15); color: var(--accent-red); }
+    #mvu-close:active { transform: translateY(-50%) scale(0.92); }
+
+    /* ========== 顶部页面栏（原侧边栏） ========== */
+    #mvu-sidebar {
+      width: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      padding: 6px 42px 6px 4px;
+      gap: 4px;
+      flex-shrink: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    #mvu-sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-btn {
+      flex: 1 1 0;
+      min-width: 52px;
+      max-width: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 8px 4px 10px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 10px;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      white-space: nowrap;
+    }
+    .sidebar-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: color 0.25s ease;
+    }
+    .sidebar-btn span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--text-secondary);
+    }
+    .sidebar-btn.active {
+      background: rgba(230, 59, 59, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-color: rgba(230, 59, 59, 0.28);
+      color: var(--accent-red);
+    }
+    .sidebar-btn.active svg { color: var(--accent-red); }
+    .sidebar-btn.active::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 2px;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 3px;
+      background: var(--accent-red);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* ========== 内容区 ========== */
+    #mvu-content {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px clamp(10px, 3.5vw, 16px) 14px;
+      position: relative;
+    }
+    #mvu-content::-webkit-scrollbar { width: 3px; }
+    #mvu-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    .tab-panel { display: none; animation: panelIn 0.3s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* 玻璃卡片 */
+    .glass-card {
+      width: 100%;
+      background: var(--glass-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+      animation: cardEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .glass-card:active { transform: scale(0.995); }
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 日式角标 */
+    .glass-card::before, .glass-card::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(240, 192, 64, 0.12);
+      transition: all 0.4s ease;
+    }
+    .glass-card::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; border-top-left-radius: 6px; }
+    .glass-card::after { bottom: 6px; right: 6px; border-left: 0; border-top: 0; border-bottom-right-radius: 6px; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .card-header-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(230, 59, 59, 0.1);
+      border-radius: 6px;
+      color: var(--accent-red);
+      flex-shrink: 0;
+    }
+    .card-header-icon.icon-gold { background: rgba(240, 192, 64, 0.1); color: var(--accent-gold); }
+    .card-header-icon.icon-cyan { background: rgba(64, 196, 230, 0.1); color: var(--accent-cyan); }
+    .card-header h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+    .card-header h3.text-rgb-flow-soft {
+      letter-spacing: 3px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 12px;
+    }
+    .stat-row:last-child { border-bottom: 0; }
+    .stat-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+    .stat-label svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .stat-value {
+      color: var(--text-primary);
+      font-weight: 500;
+      text-align: right;
+      word-break: break-all;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-value.text-gold { color: var(--accent-gold); }
+    .stat-value.text-red { color: var(--accent-red); }
+    .stat-value.text-cyan { color: var(--accent-cyan); }
+    .stat-value.text-flow-gold.text-rgb-flow-soft,
+    .stat-value.text-flow-cyan.text-rgb-flow-soft,
+    .stat-value.text-flow-red.text-rgb-flow-soft {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      color: transparent;
+    }
+
+    .bar-group { margin: 8px 0 12px; }
+    .bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: var(--text-secondary);
+    }
+    .bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+      background-size: 200% 100%;
+      animation: barGradientFlow 5s linear infinite;
+    }
+    .bar-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+      animation: shimmer 2.5s infinite;
+      mix-blend-mode: overlay;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .sidebar-btn.active span {
+      font-family: var(--font-display);
+      background: var(--rgb-flow-soft);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbTextFlow 8s linear infinite;
+    }
+
+    /* 内部横向标签页 */
+    .tab-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1;
+      min-width: 60px;
+      padding: 6px 0;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .tab-btn.active {
+      background: rgba(230, 59, 59, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-color: rgba(230, 59, 59, 0.28);
+      color: var(--accent-red);
+    }
+    .tab-content { display: none; animation: fadeIn 0.25s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .tag-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .ability-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 8px;
+      background: rgba(64, 196, 230, 0.08);
+      border: 1px solid rgba(64, 196, 230, 0.15);
+      border-radius: 5px;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      margin: 2px;
+    }
+    .ability-tag.tag-sword { background: rgba(230, 59, 59, 0.08); border-color: rgba(230, 59, 59, 0.15); color: var(--accent-red); }
+    .ability-tag.tag-special { background: rgba(240, 192, 64, 0.08); border-color: rgba(240, 192, 64, 0.15); color: var(--accent-gold); }
+    .ability-tag .tag-lvl { font-size: 9px; opacity: 0.7; border-left: 1px solid currentColor; padding-left: 3px; margin-left: 2px; }
+
+    .affection-list { display: flex; flex-direction: column; gap: 6px; }
+
+    /* 羁绊：折叠紧凑行 */
+    .aff-compact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px) saturate(1.35);
+      -webkit-backdrop-filter: blur(14px) saturate(1.35);
+      box-shadow: var(--glass-inset);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      color: inherit;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+    .aff-compact:hover {
+      background: rgba(255, 77, 141, 0.08);
+      border-color: rgba(255, 77, 141, 0.22);
+    }
+    .aff-compact:active { transform: scale(0.985); }
+    .aff-compact-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .aff-compact-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .aff-compact-name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .aff-compact-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .aff-chip {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-variant-numeric: tabular-nums;
+    }
+    .aff-chip.love {
+      color: #ff7eb3;
+      background: rgba(255, 77, 141, 0.12);
+      border-color: rgba(255, 77, 141, 0.2);
+    }
+    .aff-chip.trust {
+      color: #6ee7d5;
+      background: rgba(64, 196, 230, 0.1);
+      border-color: rgba(64, 196, 230, 0.2);
+    }
+    .aff-compact-chevron {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      opacity: 0.7;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .aff-compact:hover .aff-compact-chevron {
+      opacity: 1;
+      transform: translateX(2px);
+      color: #ff7eb3;
+    }
+
+    /* 羁绊详情模态 */
+    #aff-detail-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(10px) saturate(1.25);
+      -webkit-backdrop-filter: blur(10px) saturate(1.25);
+    }
+    #aff-detail-overlay.active { display: flex; }
+    .aff-detail-glass {
+      width: 100%;
+      max-height: calc(100% - 8px);
+      overflow-y: auto;
+      background: var(--glass-surface-strong);
+      backdrop-filter: var(--glass-blur-strong);
+      -webkit-backdrop-filter: var(--glass-blur-strong);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 16px 14px 14px;
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+      animation: affModalIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes affModalIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    #aff-detail-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.2s ease;
+    }
+    #aff-detail-close:hover {
+      background: rgba(230, 59, 59, 0.15);
+      color: var(--accent-red);
+      border-color: rgba(230, 59, 59, 0.3);
+    }
+    .aff-detail-wrap { position: relative; width: 100%; max-width: min(100%, 420px); }
+
+    .affection-card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 28px 4px 4px;
+      position: relative;
+      overflow: visible;
+    }
+    .affection-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 36px;
+      bottom: 0;
+      width: 3px;
+      border-radius: 3px;
+      background: linear-gradient(to bottom, var(--accent-red), transparent);
+      opacity: 0.45;
+    }
+    .aff-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .aff-name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .aff-name svg { color: var(--accent-gold); width: 16px; height: 16px; }
+    .aff-relation {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 500;
+      background: rgba(240, 192, 64, 0.1);
+      color: var(--accent-gold);
+      border: 1px solid rgba(240, 192, 64, 0.2);
+    }
+    .aff-bars { display: flex; flex-direction: column; gap: 6px; }
+    .aff-bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+    .aff-bar-row .aff-label { width: 32px; color: var(--text-muted); flex-shrink: 0; }
+    .aff-bar-row .mini-track { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+    .aff-bar-row .mini-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      background-size: 200% 100%;
+      animation: barGradientFlow 4.5s linear infinite;
+      overflow: hidden;
+      position: relative;
+    }
+    .aff-bar-row .aff-num { width: 28px; text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .aff-change { margin-top: 6px; font-size: 11px; color: var(--accent-gold); display: flex; align-items: center; gap: 4px; }
+
+    .world-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .world-item {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .world-item.full-width { grid-column: 1 / -1; }
+    .world-item-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
+    .world-item-label svg { width: 12px; height: 12px; }
+    .world-item-value { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+
+    .awaken-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+    .awaken-item {
+      text-align: center;
+      padding: 8px 2px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .awaken-item.active {
+      background: rgba(230, 59, 59, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-color: rgba(230, 59, 59, 0.25);
+    }
+    .awaken-item.active .awaken-icon { color: var(--accent-red); filter: drop-shadow(0 0 5px rgba(230,59,59,0.35)); }
+    .awaken-item.active .awaken-name { color: var(--accent-red); }
+    .awaken-icon { width: 20px; height: 20px; margin: 0 auto 4px; color: var(--text-muted); }
+    .awaken-name { font-size: 10px; color: var(--text-muted); }
+    .awaken-status { font-size: 9px; margin-top: 2px; }
+
+    .record-row { display: flex; justify-content: space-around; padding: 8px 0; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .record-item { text-align: center; }
+    .record-num {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 1px;
+    }
+    .record-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+    .empty-state { text-align: center; padding: 16px; color: var(--text-muted); font-size: 12px; }
+
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+
+    .combat-banner {
+      background: linear-gradient(135deg, rgba(230, 59, 59, 0.12), rgba(230, 59, 59, 0.06));
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      border: 1px solid rgba(230, 59, 59, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+      margin-bottom: 12px;
+      animation: dangerPulse 2s ease-in-out infinite;
+    }
+    @keyframes dangerPulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(230, 59, 59, 0); }
+      50% { box-shadow: 0 0 15px rgba(230, 59, 59, 0.15); }
+    }
+    .combat-banner-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--accent-red);
+      font-size: 13px;
+    }
+    .combat-banner-inner svg { animation: swordShake 0.5s ease-in-out infinite alternate; }
+    @keyframes swordShake { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+
+    #notification-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: calc(100% - 20px);
+      max-width: 300px;
+      pointer-events: none;
+    }
+    .notification {
+      background: var(--glass-surface-strong);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-glass);
+      border-left: 3px solid var(--accent-gold);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+      transform: translateX(120%);
+      animation: slideInNotice 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .notification.notice-danger { border-left-color: var(--accent-red); }
+    @keyframes slideInNotice { to { transform: translateX(0); } }
+    @keyframes fadeOutNotice { to { opacity: 0; transform: translateX(15%); } }
+
+    @media (max-width: 480px) {
+      .sidebar-btn {
+        min-width: 48px;
+        padding: 7px 2px 9px;
+        font-size: 9px;
+      }
+      .sidebar-btn svg { width: 18px; height: 18px; }
+      #mvu-content { padding: 10px 10px 12px; }
+      .glass-card { padding: 12px; margin-bottom: 10px; }
+      .world-grid { grid-template-columns: 1fr; }
+      .stat-row { font-size: 11px; }
+    }
+
+    @media (max-width: 360px) {
+      .sidebar-btn span { font-size: 8px; letter-spacing: 0; }
+      .sidebar-btn { min-width: 44px; gap: 2px; }
+      #mvu-close { width: 28px; height: 28px; right: 6px; }
+      #mvu-sidebar { padding-right: 38px; }
+    }
+  </style>
+  <script type="module">
+    let embedResizeObserver = null;
+    let lastEmbedHeight = -1;
+    let embedHeightRaf = 0;
+    let embedResizeTimer = null;
+
+    function resolveExpandedMaxHeight() {
+      let max = Math.floor(window.innerHeight * 0.72);
+      try {
+        const chat = window.parent?.document?.querySelector('#chat');
+        if (chat?.clientHeight) max = Math.floor(chat.clientHeight * 0.72);
+      } catch {
+        // 跨域或未嵌入时沿用视口比例
+      }
+      return Math.max(240, max);
+    }
+
+    function applyModalMaxHeight() {
+      const modal = document.getElementById('mvu-modal');
+      if (!modal) return;
+      const maxH = resolveExpandedMaxHeight();
+      document.documentElement.style.setProperty('--mvu-modal-max', `${maxH}px`);
+      modal.style.maxHeight = `${maxH}px`;
+    }
+
+    function measureEmbedHeight(expanded) {
+      if (!expanded) {
+        const collapsed = document.getElementById('mvu-collapsed');
+        if (!collapsed) return 48;
+        return Math.max(
+          Math.ceil(collapsed.scrollHeight),
+          Math.ceil(collapsed.getBoundingClientRect().height),
+          48,
+        );
+      }
+      applyModalMaxHeight();
+      const modal = document.getElementById('mvu-modal');
+      if (!modal) return 320;
+      return Math.ceil(modal.getBoundingClientRect().height);
+    }
+
+    function syncEmbedHeight(expanded) {
+      const collapsed = document.getElementById('mvu-collapsed');
+      const html = document.documentElement;
+      const body = document.body;
+      html.classList.toggle('mvu-folded', !expanded);
+      html.classList.toggle('mvu-expanded', expanded);
+      body.classList.toggle('mvu-folded', !expanded);
+      body.classList.toggle('mvu-expanded', expanded);
+
+      const height = measureEmbedHeight(expanded);
+      if (height === lastEmbedHeight) return;
+      lastEmbedHeight = height;
+
+      if (expanded) {
+        html.style.height = `${height}px`;
+        body.style.height = `${height}px`;
+      } else {
+        html.style.height = '';
+        body.style.height = '';
+      }
+
+      try {
+        const frame = window.frameElement;
+        if (!frame) return;
+        frame.style.setProperty('height', `${height}px`, 'important');
+        frame.style.background = 'transparent';
+        frame.style.border = 'none';
+        frame.style.display = 'block';
+      } catch {
+        // 非 iframe 嵌入时忽略
+      }
+    }
+
+    function bindEmbedHeightObserver() {
+      const collapsed = document.getElementById('mvu-collapsed');
+      const modal = document.getElementById('mvu-modal');
+      const content = document.getElementById('mvu-content');
+      if (typeof ResizeObserver === 'undefined') return;
+      embedResizeObserver?.disconnect();
+      embedResizeObserver = new ResizeObserver(() => {
+        clearTimeout(embedResizeTimer);
+        embedResizeTimer = setTimeout(() => {
+          const overlay = document.getElementById('mvu-overlay');
+          syncEmbedHeight(Boolean(overlay?.classList.contains('active')));
+        }, 120);
+      });
+      if (collapsed) embedResizeObserver.observe(collapsed);
+      if (modal) embedResizeObserver.observe(modal);
+      if (content) embedResizeObserver.observe(content);
+      const header = document.getElementById('mvu-header');
+      const sidebar = document.getElementById('mvu-sidebar');
+      if (header) embedResizeObserver.observe(header);
+      if (sidebar) embedResizeObserver.observe(sidebar);
+    }
+
+    function scheduleEmbedHeightSync(expanded) {
+      cancelAnimationFrame(embedHeightRaf);
+      embedHeightRaf = requestAnimationFrame(() => {
+        syncEmbedHeight(expanded);
+        embedHeightRaf = 0;
+      });
+    }
+
+    function setExpanded(expanded) {
+      const overlay = document.getElementById('mvu-overlay');
+      if (!overlay) return;
+      overlay.classList.toggle('active', expanded);
+      scheduleEmbedHeightSync(expanded);
+    }
+
+    function initBgImage() {
+      const sync = () => {
+        scheduleEmbedHeightSync(Boolean(document.getElementById('mvu-overlay')?.classList.contains('active')));
+      };
+      document.querySelectorAll('#mvu-bg img, #mvu-collapsed-bg img').forEach((img) => {
+        if (img.complete && img.naturalWidth > 0) sync();
+        else {
+          img.addEventListener('load', sync, { once: true });
+          img.addEventListener('error', () => console.warn('[mvu] 背景图加载失败'), { once: true });
+        }
+      });
+    }
+
+    function initToggle() {
+      const collapsed = document.getElementById('mvu-collapsed');
+      const overlay = document.getElementById('mvu-overlay');
+      const closeBtn = document.getElementById('mvu-close');
+      if (!collapsed || !overlay) return;
+      collapsed.addEventListener('click', () => setExpanded(true));
+      if (closeBtn) closeBtn.addEventListener('click', () => setExpanded(false));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) setExpanded(false); });
+      bindEmbedHeightObserver();
+      syncEmbedHeight(false);
+    }
+
+    function initSidebar() {
+      const sidebar = document.getElementById('mvu-sidebar');
+      if (!sidebar) return;
+      sidebar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sidebar-btn');
+        if (!btn) return;
+        const targetId = btn.dataset.target;
+        sidebar.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(targetId);
+        if (target) target.classList.add('active');
+        closeAffDetail();
+        scheduleEmbedHeightSync(true);
+      });
+    }
+
+    function initInnerTabs() {
+      document.querySelectorAll('.tab-nav').forEach(nav => {
+        nav.addEventListener('click', (e) => {
+          const btn = e.target.closest('.tab-btn');
+          if (!btn) return;
+          const group = btn.closest('.tab-group');
+          const targetId = btn.dataset.target;
+          group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          group.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          const target = group.querySelector(targetId);
+          if (target) target.classList.add('active');
+          scheduleEmbedHeightSync(true);
+        });
+      });
+    }
+
+    function showNotice(message, type = 'info') {
+      const container = document.getElementById('notification-container');
+      if (!container) return;
+      const notice = document.createElement('div');
+      notice.className = `notification notice-${type}`;
+      let iconSvg = '';
+      if (type === 'danger') {
+        iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      } else {
+        iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+      }
+      notice.innerHTML = `${iconSvg}<span>${message}</span>`;
+      container.appendChild(notice);
+      setTimeout(() => {
+        notice.style.animation = 'fadeOutNotice 0.35s ease forwards';
+        setTimeout(() => notice.remove(), 350);
+      }, 2800);
+    }
+
+    function unwrapMvuValue(value) {
+      if (Array.isArray(value) && value.length >= 1 && (value[0] === null || typeof value[0] !== 'object')) {
+        return value[0];
+      }
+      return value;
+    }
+
+    function mvuGet(obj, path, defaultValue) {
+      return unwrapMvuValue(_.get(obj, path, defaultValue));
+    }
+
+    function isEmptySlot(value) {
+      const v = unwrapMvuValue(value);
+      return v === '' || v === null || v === undefined || v === '无' || v === '--';
+    }
+
+    function getMessageVariableOption(messageId) {
+      if (messageId !== undefined && messageId !== null && !Number.isNaN(messageId)) {
+        return { type: 'message', message_id: messageId };
+      }
+      return { type: 'message', message_id: 'latest' };
+    }
+
+    function readStatDataFromOption(option) {
+      if (typeof Mvu !== 'undefined') {
+        const fromMvu = _.get(Mvu.getMvuData(option), 'stat_data', {});
+        if (!_.isEmpty(fromMvu)) return fromMvu;
+      }
+      if (typeof getVariables === 'function') {
+        const fromVars = _.get(getVariables(option), 'stat_data', {});
+        if (!_.isEmpty(fromVars)) return fromVars;
+      }
+      return {};
+    }
+
+    async function resolveStatData() {
+      if (typeof waitGlobalInitialized === 'function') {
+        await waitGlobalInitialized('Mvu');
+      }
+
+      // 嵌入历史消息的状态栏也读取最新楼层变量，避免显示旧快照
+      const candidateIds = ['latest', -1];
+
+      for (const messageId of candidateIds) {
+        const option = getMessageVariableOption(messageId);
+        if (typeof waitUntil === 'function' && typeof Mvu !== 'undefined') {
+          try {
+            await waitUntil(() => {
+              const data = Mvu.getMvuData(option);
+              return _.has(data, 'stat_data') && !_.isEmpty(_.get(data, 'stat_data'));
+            }, { timeout: 1200 });
+          } catch {
+            /* 尝试下一个候选楼层 */
+          }
+        }
+        const stat_data = readStatDataFromOption(option);
+        if (!_.isEmpty(stat_data)) return stat_data;
+      }
+
+      return {};
+    }
+
+    function recordEntries(record) {
+      if (!record || typeof record !== 'object' || Array.isArray(record)) return [];
+      return Object.entries(record).filter(([key]) => !key.startsWith('$'));
+    }
+
+    async function populateData() {
+      try {
+        const data = await resolveStatData();
+        const snapshot = JSON.stringify({
+          clothes: _.get(data, '玩家.当前服装'),
+          inventory: _.get(data, '玩家.行囊'),
+          weapon: _.get(data, '玩家.武器'),
+        });
+        if (snapshot === lastStatSnapshot && document.getElementById('inventory-list')?.innerHTML) {
+          return;
+        }
+        lastStatSnapshot = snapshot;
+        const player = mvuGet(data, '玩家', {});
+        const world = mvuGet(data, '世界', {});
+        const affection = mvuGet(data, '角色好感度', {});
+        const combatRecord = mvuGet(data, '战斗记录', {});
+
+        setText('player-level', mvuGet(player, '等级', '--'));
+        setText('player-exp', mvuGet(player, '经验值', '--'));
+        setText('player-identity', mvuGet(player, '身份', '--'));
+        setText('player-location', mvuGet(player, '当前位置', '--'));
+        setText('player-residence', mvuGet(player, '居住', '--'));
+        setText('player-quest', mvuGet(player, '当前任务', '--'));
+        setText('player-money', mvuGet(player, '金钱', '--'));
+        setText('player-style', mvuGet(player, '流派', '--'));
+        setText('player-permanent-injury', mvuGet(player, '永久损伤', '--') || '无');
+
+        const hp = Number(mvuGet(player, '身体状况', 100));
+        const hpDesc = mvuGet(player, '身体状态描述', '健康');
+        setText('hp-text', `${hp}% · ${hpDesc}`);
+        setWidth('hp-fill', hp + '%');
+        const hpFill = document.getElementById('hp-fill');
+        if (hpFill) {
+          hpFill.classList.remove('hp-critical', 'hp-warn', 'hp-healthy');
+          hpFill.style.background = '';
+          hpFill.style.backgroundImage = '';
+          if (hp < 30) hpFill.classList.add('hp-critical');
+          else if (hp < 60) hpFill.classList.add('hp-warn');
+          else hpFill.classList.add('hp-healthy');
+        }
+
+        const sp = Number(mvuGet(player, '呼吸', 0));
+        const spMax = Number(mvuGet(player, '呼吸上限', 20)) || 20;
+        const spPercent = Math.min(100, Math.max(0, (sp / spMax) * 100));
+        setText('sp-text', `${sp} / ${spMax}`);
+        setWidth('sp-fill', spPercent + '%');
+
+        const weapon = mvuGet(player, '武器', {});
+        setText('weapon-name', mvuGet(weapon, '名称', '--'));
+        setText('weapon-color', mvuGet(weapon, '刃色', '--'));
+        setText('weapon-durability', mvuGet(weapon, '耐久', '--'));
+        setText('weapon-status', mvuGet(weapon, '状态', '--'));
+
+        const clothes = mvuGet(player, '当前服装', {});
+        const clothesParts = [
+          !isEmptySlot(clothes?.羽织) ? `羽织:${mvuGet(clothes, '羽织', '')}` : '',
+          !isEmptySlot(clothes?.内搭) ? `内搭:${mvuGet(clothes, '内搭', '')}` : '',
+          !isEmptySlot(clothes?.下装) ? `下装:${mvuGet(clothes, '下装', '')}` : '',
+          !isEmptySlot(clothes?.足具) ? `足具:${mvuGet(clothes, '足具', '')}` : '',
+        ].filter(Boolean);
+        const remark = mvuGet(clothes, '备注', '');
+        const clothesStr = clothesParts.length
+          ? clothesParts.join(' · ') + (remark ? ` · ${remark}` : '')
+          : '无';
+        setText('clothes-display', clothesStr);
+
+        const inventory = mvuGet(player, '行囊', {});
+        const invContainer = document.getElementById('inventory-list');
+        if (invContainer) {
+          const entries = recordEntries(inventory);
+          invContainer.innerHTML = entries.length === 0
+            ? '<div class="empty-state">行囊空空如也</div>'
+            : entries.map(([name, item]) => {
+                const count = mvuGet(item, '数量', 1);
+                return `<span class="tag-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>${name} x${count}</span>`;
+              }).join('');
+        }
+
+        const abilities = mvuGet(player, '能力', {});
+        renderAbilityList('skills-list', mvuGet(abilities, '掌握战技', {}), '');
+        renderAbilityList('sword-list', mvuGet(abilities, '掌握剑型', {}), 'tag-sword');
+        renderAbilityList('special-list', mvuGet(abilities, '特殊能力', {}), 'tag-special');
+
+        const combat = mvuGet(player, '战斗状态', {});
+        const inCombat = Boolean(mvuGet(combat, '是否战斗中', false));
+        const combatBanner = document.getElementById('combat-banner');
+        if (combatBanner) {
+          if (inCombat) {
+            combatBanner.style.display = 'block';
+            setText('combat-enemy', mvuGet(combat, '当前敌人', '未知'));
+          } else {
+            combatBanner.style.display = 'none';
+          }
+        }
+
+        const affContainer = document.getElementById('affection-container');
+        if (affContainer) {
+          const entries = recordEntries(affection);
+          affContainer.innerHTML = entries.length === 0
+            ? '<div class="empty-state">暂无角色数据</div>'
+            : entries.map(([name, affData]) => {
+                const gw = Number(mvuGet(affData, '好感', 0));
+                const trust = Number(mvuGet(affData, '信任', 0));
+                const rel = mvuGet(affData, '关系', '陌生');
+                const change = mvuGet(affData, '本回合变动', '');
+                return `
+                  <button type="button" class="aff-compact" data-name="${escapeHtml(name)}" data-gw="${gw}" data-trust="${trust}" data-rel="${escapeHtml(rel)}" data-change="${escapeHtml(change)}">
+                    <div class="aff-compact-main">
+                      <div class="aff-compact-top">
+                        <span class="aff-compact-name text-rgb-flow-soft">${escapeHtml(name)}</span>
+                        <span class="aff-relation">${escapeHtml(rel)}</span>
+                      </div>
+                      <div class="aff-compact-chips">
+                        <span class="aff-chip love">好感 ${gw}</span>
+                        <span class="aff-chip trust">信任 ${trust}</span>
+                      </div>
+                    </div>
+                    <svg class="aff-compact-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>`;
+              }).join('');
+        }
+
+        setText('world-time', mvuGet(world, '当前时间', '--'));
+        setText('world-location', mvuGet(world, '当前地点', '--'));
+        setText('world-stage', mvuGet(world, '主线阶段', '--'));
+
+        const tasks = mvuGet(world, '近期事务', {});
+        const tasksContainer = document.getElementById('world-tasks');
+        if (tasksContainer) {
+          const taskEntries = recordEntries(tasks);
+          tasksContainer.innerHTML = taskEntries.length === 0
+            ? '<div class="empty-state">暂无待办事务</div>'
+            : taskEntries.map(([name, desc]) =>
+                `<span class="tag-item" title="${desc}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>${name}</span>`
+              ).join('');
+        }
+
+        setText('record-kills', mvuGet(combatRecord, '累计击杀', 0));
+        setText('record-tasks', mvuGet(combatRecord, '累计完成任务', 0));
+        setText('record-training', mvuGet(combatRecord, '累计修炼天数', 0));
+
+        const mark = Boolean(mvuGet(combatRecord, '斑纹觉醒', false));
+        const transparent = Boolean(mvuGet(combatRecord, '通透世界觉醒', false));
+        const red = Boolean(mvuGet(combatRecord, '赫刀觉醒', false));
+        toggleClass('awaken-mark', 'active', mark);
+        toggleClass('awaken-transparent', 'active', transparent);
+        toggleClass('awaken-red', 'active', red);
+        setText('awaken-mark-status', mark ? '已觉醒' : '未觉醒');
+        setText('awaken-transparent-status', transparent ? '已觉醒' : '未觉醒');
+        setText('awaken-red-status', red ? '已觉醒' : '未觉醒');
+
+      } catch (err) {
+        console.error('MVU populate error:', err);
+      }
+      syncEmbedHeight(Boolean(document.getElementById('mvu-overlay')?.classList.contains('active')));
+    }
+
+    function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+    function setWidth(id, width) { const el = document.getElementById(id); if (el) el.style.width = width; }
+    function toggleClass(id, cls, force) { const el = document.getElementById(id); if (el) el.classList.toggle(cls, force); }
+    function escapeHtml(text) {
+      return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function closeAffDetail() {
+      document.getElementById('aff-detail-overlay')?.classList.remove('active');
+    }
+
+    function openAffDetail({ name, gw, trust, rel, change }) {
+      const overlay = document.getElementById('aff-detail-overlay');
+      const body = document.getElementById('aff-detail-body');
+      if (!overlay || !body) return;
+      const gwNum = Number(gw);
+      const trustNum = Number(trust);
+      const gwPercent = Math.min(100, Math.max(0, (gwNum + 100) / 2));
+      const trustPercent = Math.min(100, Math.max(0, (trustNum + 100) / 2));
+      body.innerHTML = `
+        <div class="affection-card">
+          <div class="aff-header">
+            <div class="aff-name"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="text-rgb-flow-soft">${escapeHtml(name)}</span></div>
+            <span class="aff-relation">${escapeHtml(rel)}</span>
+          </div>
+          <div class="aff-bars">
+            <div class="aff-bar-row"><span class="aff-label">好感</span><div class="mini-track"><div class="mini-fill fill-love" style="width:${gwPercent}%"></div></div><span class="aff-num">${gwNum}</span></div>
+            <div class="aff-bar-row"><span class="aff-label">信任</span><div class="mini-track"><div class="mini-fill fill-trust" style="width:${trustPercent}%"></div></div><span class="aff-num">${trustNum}</span></div>
+          </div>
+          ${change ? `<div class="aff-change"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>${escapeHtml(change)}</div>` : ''}
+        </div>`;
+      overlay.classList.add('active');
+    }
+
+    function initAffectionModal() {
+      const overlay = document.getElementById('aff-detail-overlay');
+      const closeBtn = document.getElementById('aff-detail-close');
+      const container = document.getElementById('affection-container');
+      if (!overlay || !container) return;
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.aff-compact');
+        if (!btn) return;
+        openAffDetail({
+          name: btn.dataset.name ?? '',
+          gw: btn.dataset.gw ?? '0',
+          trust: btn.dataset.trust ?? '0',
+          rel: btn.dataset.rel ?? '陌生',
+          change: btn.dataset.change ?? '',
+        });
+      });
+      closeBtn?.addEventListener('click', closeAffDetail);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAffDetail(); });
+    }
+    function renderAbilityList(containerId, data, typeClass) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const entries = recordEntries(data);
+      container.innerHTML = entries.length === 0
+        ? '<div class="empty-state">尚未掌握</div>'
+        : entries.map(([n, i]) => {
+            const lvl = mvuGet(i, '熟练度', '入门');
+            return `<span class="ability-tag ${typeClass}">${n}<span class="tag-lvl">${lvl}</span></span>`;
+          }).join('');
+    }
+
+    let mvuPollTimer = null;
+    let lastStatSnapshot = '';
+
+    function bindMvuEvents() {
+      if (typeof eventOn !== 'function') return;
+
+      const refresh = () => { void populateData(); };
+
+      if (typeof Mvu !== 'undefined') {
+        eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, refresh);
+        eventOn(Mvu.events.VARIABLE_UPDATE_STARTED, refresh);
+        eventOn(Mvu.events.VARIABLE_INITIALIZED, refresh);
+      }
+
+      if (typeof tavern_events !== 'undefined') {
+        eventOn(tavern_events.MESSAGE_UPDATED, refresh);
+        eventOn(tavern_events.MESSAGE_SWIPED, refresh);
+        eventOn(tavern_events.GENERATION_ENDED, refresh);
+        eventOn(tavern_events.CHAT_CHANGED, refresh);
+      }
+    }
+
+    async function ensureMvuEvents() {
+      if (typeof waitGlobalInitialized === 'function') {
+        await waitGlobalInitialized('Mvu');
+      }
+      bindMvuEvents();
+      if (mvuPollTimer === null) {
+        mvuPollTimer = setInterval(() => {
+          if (document.visibilityState === 'hidden') return;
+          void populateData();
+        }, 5000);
+      }
+    }
+
+    async function init() {
+      initToggle();
+      initBgImage();
+      initSidebar();
+      initInnerTabs();
+      initAffectionModal();
+      await ensureMvuEvents();
+      await populateData();
+      setTimeout(() => { void populateData(); }, 400);
+      setTimeout(() => { void populateData(); }, 1200);
+      setTimeout(() => { void populateData(); }, 3000);
+    }
+
+    if (typeof $ === 'function') {
+      $(errorCatched(init));
+    } else {
+      document.documentElement.classList.add('mvu-folded');
+      initToggle();
+      initBgImage();
+      initSidebar();
+      initInnerTabs();
+      initAffectionModal();
+      void ensureMvuEvents().then(() => populateData());
+    }
+  </script>
+</head>
+<body class="mvu-folded">
+  <div id="notification-container"></div>
+
+  <!-- 收起状态 -->
+  <div id="mvu-collapsed">
+    <div id="mvu-collapsed-bg" aria-hidden="true">
+      <img src="https://files.catbox.moe/fcllss.jpg" alt="" decoding="async">
+      <div class="mvu-bg-veil mvu-bg-veil--compact"></div>
+    </div>
+    <div class="mvu-collapsed-front">
+      <span class="kn-title">鬼灭</span>
+      <div class="sword-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="url(#swordGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs>
+            <linearGradient id="swordGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ecdc4"><animate attributeName="stop-color" values="#4ecdc4;#e63b3b;#f0c040;#4ecdc4" dur="3s" repeatCount="indefinite"/></stop>
+              <stop offset="100%" stop-color="#e63b3b"><animate attributeName="stop-color" values="#e63b3b;#f0c040;#4ecdc4;#e63b3b" dur="3s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+          </defs>
+          <path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/>
+        </svg>
+      </div>
+      <span class="kn-title">之刃</span>
+      <span class="kn-watermark">design&nbsp;by&nbsp;katou</span>
+    </div>
+  </div>
+
+  <!-- 展开模态框 -->
+  <div id="mvu-overlay">
+    <div id="mvu-modal">
+      <div id="mvu-bg" aria-hidden="true">
+        <img src="https://files.catbox.moe/fcllss.jpg" alt="" decoding="async" fetchpriority="high">
+        <div class="mvu-bg-veil"></div>
+      </div>
+      <header id="mvu-header">
+        <nav id="mvu-sidebar" aria-label="状态栏分页">
+          <button class="sidebar-btn active" data-target="panel-profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>档案</span>
+          </button>
+          <button class="sidebar-btn" data-target="panel-gear">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
+            <span>装备</span>
+          </button>
+          <button class="sidebar-btn" data-target="panel-ability">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>能力</span>
+          </button>
+          <button class="sidebar-btn" data-target="panel-bond">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span>羁绊</span>
+          </button>
+          <button class="sidebar-btn" data-target="panel-world">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>世界</span>
+          </button>
+        </nav>
+        <button id="mvu-close" aria-label="关闭">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <main id="mvu-content">
+        <div id="panel-profile" class="tab-panel active">
+          <div id="combat-banner" class="combat-banner" style="display:none;">
+            <div class="combat-banner-inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
+              <span>战斗中 — <span id="combat-enemy">未知</span></span>
+            </div>
+          </div>
+          <div class="glass-card delay-1">
+            <div class="card-header"><div class="card-header-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h3 class="text-rgb-flow-soft">剑士档案</h3></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>等级 / 经验</span><span class="stat-value text-flow-gold text-rgb-flow-soft">Lv.<span id="player-level">--</span> / <span id="player-exp">--</span></span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>身份</span><span class="stat-value" id="player-identity">--</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>当前位置</span><span class="stat-value" id="player-location">--</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>居所</span><span class="stat-value" id="player-residence">--</span></div>
+          </div>
+          <div class="glass-card delay-2">
+            <div class="card-header"><div class="card-header-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><h3 class="text-rgb-flow-soft">生命与呼吸</h3></div>
+            <div class="bar-group bar-hp"><div class="bar-header"><span>身体状况</span><span id="hp-text" class="stat-value">--</span></div><div class="bar-track"><div id="hp-fill" class="bar-fill hp-healthy" style="width:100%"></div></div></div>
+            <div class="bar-group bar-sp"><div class="bar-header"><span>呼吸之力</span><span id="sp-text" class="stat-value text-flow-cyan text-rgb-flow-soft">--</span></div><div class="bar-track"><div id="sp-fill" class="bar-fill" style="width:100%"></div></div></div>
+            <div class="stat-row" style="margin-top:6px;"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/></svg>流派</span><span class="stat-value text-flow-cyan text-rgb-flow-soft" id="player-style">--</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>永久损伤</span><span class="stat-value text-red" id="player-permanent-injury">--</span></div>
+          </div>
+        </div>
+
+        <div id="panel-gear" class="tab-panel">
+          <div class="glass-card delay-1">
+            <div class="card-header"><div class="card-header-icon icon-gold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></div><h3 class="text-rgb-flow-soft">装备与物资</h3></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/></svg>日轮刀</span><span class="stat-value"><span id="weapon-name">--</span> [<span id="weapon-color">--</span>]</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/></svg>耐久</span><span class="stat-value"><span id="weapon-durability">--</span>% · <span id="weapon-status">--</span></span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>持有金</span><span class="stat-value text-flow-gold text-rgb-flow-soft"><span id="player-money">--</span> 円</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>当前服装</span><span class="stat-value" id="clothes-display">--</span></div>
+            <div class="stat-row"><span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>任务</span><span class="stat-value" id="player-quest">--</span></div>
+          </div>
+        </div>
+
+        <div id="panel-ability" class="tab-panel">
+          <div class="glass-card delay-1 tab-group">
+            <div class="card-header"><div class="card-header-icon icon-cyan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3 class="text-rgb-flow-soft">行囊与能力</h3></div>
+            <nav class="tab-nav">
+              <button class="tab-btn active" data-target="#tab-inventory">行囊</button>
+              <button class="tab-btn" data-target="#tab-skills">战技</button>
+              <button class="tab-btn" data-target="#tab-sword">剑型</button>
+              <button class="tab-btn" data-target="#tab-special">特殊</button>
+            </nav>
+            <div id="tab-inventory" class="tab-content active"><div id="inventory-list" class="tag-grid"></div></div>
+            <div id="tab-skills" class="tab-content"><div id="skills-list"></div></div>
+            <div id="tab-sword" class="tab-content"><div id="sword-list"></div></div>
+            <div id="tab-special" class="tab-content"><div id="special-list"></div></div>
+          </div>
+        </div>
+
+        <div id="panel-bond" class="tab-panel">
+          <div class="glass-card delay-1">
+            <div class="card-header"><div class="card-header-icon" style="background:rgba(255,77,141,0.1);color:#ff4d8d;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><h3 class="text-rgb-flow-soft">角色羁绊</h3></div>
+            <div id="affection-container" class="affection-list"></div>
+          </div>
+        </div>
+
+        <div id="panel-world" class="tab-panel">
+          <div class="glass-card delay-1">
+            <div class="card-header"><div class="card-header-icon icon-gold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h3 class="text-rgb-flow-soft">世界与记录</h3></div>
+            <div class="world-grid">
+              <div class="world-item full-width"><div class="world-item-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>当前时间</div><div class="world-item-value" id="world-time">--</div></div>
+              <div class="world-item"><div class="world-item-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>当前地点</div><div class="world-item-value" id="world-location">--</div></div>
+              <div class="world-item"><div class="world-item-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>主线阶段</div><div class="world-item-value" id="world-stage">--</div></div>
+            </div>
+            <div style="margin-top:8px;"><div class="world-item-label" style="margin-bottom:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>近期事务</div><div id="world-tasks" class="tag-grid"></div></div>
+            <div class="record-row">
+              <div class="record-item"><div class="record-num text-rgb-flow-soft" id="record-kills">0</div><div class="record-label">累计击杀</div></div>
+              <div class="record-item"><div class="record-num text-rgb-flow-soft" id="record-tasks">0</div><div class="record-label">完成任务</div></div>
+              <div class="record-item"><div class="record-num text-rgb-flow-soft" id="record-training">0</div><div class="record-label">修炼天数</div></div>
+            </div>
+            <div class="awaken-grid">
+              <div id="awaken-mark" class="awaken-item"><div class="awaken-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 0-7 4-7 11v3l-2 2h18l-2-2v-3c0-7-7-11-7-11z"/><path d="M9 22l3-3 3 3"/></svg></div><div class="awaken-name">斑纹</div><div class="awaken-status" id="awaken-mark-status">未觉醒</div></div>
+              <div id="awaken-transparent" class="awaken-item"><div class="awaken-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="awaken-name">通透</div><div class="awaken-status" id="awaken-transparent-status">未觉醒</div></div>
+              <div id="awaken-red" class="awaken-item"><div class="awaken-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></div><div class="awaken-name">赫刀</div><div class="awaken-status" id="awaken-red-status">未觉醒</div></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div id="aff-detail-overlay">
+        <div class="aff-detail-wrap">
+          <button id="aff-detail-close" type="button" aria-label="关闭羁绊详情">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <div class="aff-detail-glass">
+            <div id="aff-detail-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>

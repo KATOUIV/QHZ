@@ -1,0 +1,301 @@
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+
+<div class="neko-wrap">
+  <div class="neko-shell">
+    <details class="neko-card neko-card--pending">
+      <summary class="neko-summary">
+        <span class="neko-avatar" aria-hidden="true">
+          <img src="https://i.postimg.cc/DwFQBGk9/ezgif-201bf4672c1b72.gif" alt="喵~" />
+          <span class="neko-avatar-ring"></span>
+        </span>
+        <span class="neko-bar">
+          <span class="neko-bar-glow"></span>
+          <span class="neko-status-dot" aria-hidden="true"></span>
+          <span class="neko-title">喵喵喵~ 变量更新中~</span>
+          <span class="neko-paw" aria-hidden="true">🐾</span>
+        </span>
+      </summary>
+      <div class="neko-var-body">$1</div>
+    </details>
+  </div>
+</div>
+
+<style>
+  .neko-wrap {
+    --neko-bg-deep: #0c0b10;
+    --neko-panel: rgba(16, 14, 22, 0.94);
+    --neko-body: rgba(20, 18, 28, 0.88);
+    --neko-border: rgba(240, 192, 64, 0.16);
+    --neko-border-active: rgba(78, 205, 196, 0.32);
+    --neko-text: #e8dfd0;
+    --neko-text-muted: #9a9288;
+    --neko-text-dim: #6f6860;
+    --neko-gold: #f0c040;
+    --neko-cyan: #4ecdc4;
+    --neko-red: #e87070;
+    --neko-font: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --neko-font-display: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    text-align: center;
+    margin: 10px 0;
+    font-family: var(--neko-font);
+    color: var(--neko-text);
+  }
+
+  .neko-shell {
+    display: inline-block;
+    text-align: left;
+    max-width: min(480px, 96vw);
+  }
+
+  .neko-card {
+    border: none;
+    background: none;
+  }
+
+  .neko-summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    user-select: none;
+  }
+
+  .neko-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .neko-avatar {
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(78, 205, 196, 0.45);
+    box-shadow:
+      0 0 14px rgba(78, 205, 196, 0.22),
+      0 0 28px rgba(240, 192, 64, 0.08);
+    background: #1a1822;
+    animation: neko-float 2.4s ease-in-out infinite;
+  }
+
+  .neko-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .neko-avatar-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid rgba(78, 205, 196, 0.35);
+    animation: neko-ring-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .neko-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    margin-left: -12px;
+    padding: 0 18px 0 22px;
+    border-radius: 0 18px 18px 0;
+    border: 1px solid var(--neko-border-active);
+    background:
+      linear-gradient(135deg, rgba(24, 22, 32, 0.98) 0%, rgba(14, 13, 18, 0.98) 100%);
+    box-shadow:
+      0 4px 18px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+
+  .neko-bar-glow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(78, 205, 196, 0.08) 35%,
+      rgba(240, 192, 64, 0.1) 50%,
+      rgba(78, 205, 196, 0.08) 65%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: neko-sweep 2.8s linear infinite;
+    pointer-events: none;
+  }
+
+  .neko-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--neko-cyan);
+    box-shadow: 0 0 8px rgba(78, 205, 196, 0.75);
+    animation: neko-dot-pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .neko-title {
+    flex: 1;
+    font-family: var(--neko-font-display);
+    font-size: 0.92em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: linear-gradient(90deg, #8fd9d2, #f0c040, #4ecdc4, #f0c040);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: neko-text-flow 4s linear infinite;
+  }
+
+  .neko-paw {
+    font-size: 0.9em;
+    opacity: 0.75;
+    filter: drop-shadow(0 0 4px rgba(240, 192, 64, 0.35));
+    animation: neko-paw-wiggle 1.6s ease-in-out infinite;
+  }
+
+  .neko-var-body {
+    max-height: 340px;
+    overflow: auto;
+    margin: 8px 0 0 26px;
+    padding: 14px 16px;
+    color: var(--neko-text-muted);
+    line-height: 1.75;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.84em;
+    font-family: 'Cascadia Code', 'Consolas', 'Noto Sans SC', monospace;
+    background:
+      linear-gradient(160deg, rgba(22, 20, 30, 0.96) 0%, rgba(12, 11, 16, 0.98) 100%);
+    border: 1px solid var(--neko-border);
+    border-radius: 14px;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(78, 205, 196, 0.35) transparent;
+  }
+
+  .neko-var-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .neko-var-body::-webkit-scrollbar-thumb {
+    background: rgba(78, 205, 196, 0.28);
+    border-radius: 999px;
+  }
+
+  .neko-var-body .neko-tag {
+    color: var(--neko-cyan);
+    font-weight: 600;
+  }
+
+  .neko-var-body .neko-key {
+    color: var(--neko-gold);
+  }
+
+  .neko-var-body .neko-str {
+    color: #a8d4a0;
+  }
+
+  .neko-card--pending[open] .neko-var-body {
+    animation: neko-body-in 0.35s ease forwards;
+  }
+
+  .neko-card--pending[open] .neko-bar-glow {
+    animation: none;
+    opacity: 0;
+  }
+
+  @keyframes neko-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  @keyframes neko-ring-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.04); }
+  }
+
+  @keyframes neko-sweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes neko-dot-pulse {
+    0%, 100% { opacity: 0.45; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  @keyframes neko-text-flow {
+    0% { background-position: 0% center; }
+    100% { background-position: 220% center; }
+  }
+
+  @keyframes neko-paw-wiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-12deg) scale(1.08); }
+    75% { transform: rotate(12deg) scale(1.08); }
+  }
+
+  @keyframes neko-body-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .neko-avatar,
+    .neko-avatar-ring,
+    .neko-bar-glow,
+    .neko-status-dot,
+    .neko-title,
+    .neko-paw {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+$(function () {
+  errorCatched(function initNekoPendingVarBody() {
+    const slot = document.querySelector('.neko-card--pending .neko-var-body');
+    if (!slot) return;
+
+    let content = slot.textContent ?? '';
+    if (content.trim() === '$1') {
+      const message =
+        typeof getChatMessages === 'function' && typeof getCurrentMessageId === 'function'
+          ? getChatMessages(getCurrentMessageId())?.[0]?.message ?? ''
+          : '';
+
+      const match =
+        message.match(/<UpdateVariable(?:variable)?>(?!.*<\/UpdateVariable(?:variable)?>)\s*([\s\S]*)$/i) ??
+        message.match(/<UpdateVariable(?:variable)?>\s*([\s\S]*?)\s*<\/UpdateVariable(?:variable)?>/i);
+
+      if (match?.[1]) content = match[1].trim();
+    }
+
+    slot.innerHTML = formatNekoVarContent(content);
+  })();
+
+  function formatNekoVarContent(raw) {
+    const escape = typeof _ !== 'undefined' && typeof _.escape === 'function'
+      ? _.escape
+      : (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const escaped = escape(raw);
+    return escaped
+      .replace(/(&lt;\/?(?:Analysis|JSONPatch|UpdateVariable(?:variable)?)&gt;)/g, '<span class="neko-tag">$1</span>')
+      .replace(/(&quot;(?:op|path|value|from|to)&quot;\s*:)/g, '<span class="neko-key">$1</span>')
+      .replace(/(&quot;[^&]*?&quot;)/g, '<span class="neko-str">$1</span>');
+  }
+});
+</script>

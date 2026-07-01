@@ -1,0 +1,2948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>咒术回战 · 关键词激活器</title>
+<style>/* ═══════════════════════════════════════════════════════════════════
+   咒术回战关键词激活器 — 全局样式
+   设计风格: 魔幻二次元 · 毛玻璃拟态 · 七彩流光
+   移动端优先 (375px基准)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── CSS 自定义属性 ── */
+:root {
+  --rarity-common: #b0b0b0;
+  --rarity-common-glow: rgba(176, 176, 176, 0.3);
+  --rarity-rare: #4fc3f7;
+  --rarity-rare-glow: rgba(79, 195, 247, 0.4);
+  --rarity-epic: #ce93d8;
+  --rarity-epic-glow: rgba(206, 147, 216, 0.45);
+  --rarity-legendary: #ffd54f;
+  --rarity-legendary-glow: rgba(255, 213, 79, 0.5);
+  --rarity-mythic: #ff6d6d;
+
+  --glass-bg: rgba(15, 15, 25, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-blur: 16px;
+
+  --text-primary: #f0e6d3;
+  --text-secondary: #b8a9c9;
+  --text-accent: #ffd54f;
+
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 24px;
+
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 20px; --radius-full: 9999px;
+
+  --font-display: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'SimSun', serif;
+  --font-body: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --font-art: 'STXingkai', 'KaiTi', 'STKaiti', 'Ma Shan Zheng', cursive;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; max-width: 100%;
+  height: auto; min-height: 0;
+  overflow: visible;
+  background: transparent !important;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+}
+
+html.ka-folded, html.ka-folded body, body.ka-folded { overflow: visible; height: fit-content; min-height: 0; }
+html.ka-expanded, html.ka-expanded body, body.ka-expanded { overflow: hidden; height: auto; min-height: 0; }
+body.ka-expanded #ka-collapsed { display: none; }
+body.ka-folded #main-modal { display: none !important; }
+
+#ka-collapsed {
+  position: relative; width: 100%; max-width: 100%;
+  min-height: 44px; display: flex; align-items: center; justify-content: center;
+  padding: 4px 0; cursor: pointer; touch-action: manipulation;
+}
+
+/* ── 文字艺术效果 ── */
+.text-art {
+  font-family: var(--font-art); font-weight: 700;
+  text-shadow:
+    0 0 10px currentColor, 0 0 20px currentColor,
+    1px 1px 0 rgba(0,0,0,0.8), -1px -1px 0 rgba(0,0,0,0.8),
+    1px -1px 0 rgba(0,0,0,0.8), -1px 1px 0 rgba(0,0,0,0.8);
+  -webkit-text-stroke: 1px rgba(0,0,0,0.6);
+  paint-order: stroke fill; letter-spacing: 0.05em;
+}
+
+/* ── 毛玻璃 ── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-heavy {
+  background: rgba(10,10,20,0.7);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── 七彩流光 ── */
+@keyframes rainbow-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainbow-glow {
+  0% { box-shadow: 0 0 8px rgba(255,109,109,0.5), 0 0 16px rgba(255,109,109,0.3); }
+  16% { box-shadow: 0 0 8px rgba(255,213,79,0.5), 0 0 16px rgba(255,213,79,0.3); }
+  33% { box-shadow: 0 0 8px rgba(79,195,247,0.5), 0 0 16px rgba(79,195,247,0.3); }
+  50% { box-shadow: 0 0 8px rgba(206,147,216,0.5), 0 0 16px rgba(206,147,216,0.3); }
+  66% { box-shadow: 0 0 8px rgba(165,214,167,0.5), 0 0 16px rgba(165,214,167,0.3); }
+  83% { box-shadow: 0 0 8px rgba(255,183,77,0.5), 0 0 16px rgba(255,183,77,0.3); }
+  100% { box-shadow: 0 0 8px rgba(255,109,109,0.5), 0 0 16px rgba(255,109,109,0.3); }
+}
+
+.rainbow-text {
+  background: linear-gradient(270deg, #ff6d6d, #ffd54f, #4fc3f7, #ce93d8, #a5d6a7, #ffb74d, #ff6d6d);
+  background-size: 600% 100%;
+  animation: rainbow-flow 3s linear infinite;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── 稀有度色彩 ── */
+.rarity-common { color: var(--rarity-common); }
+.rarity-rare { color: var(--rarity-rare); }
+.rarity-epic { color: var(--rarity-epic); }
+.rarity-legendary { color: var(--rarity-legendary); }
+.rarity-mythic {
+  background: linear-gradient(270deg, #ff6d6d, #ffd54f, #4fc3f7, #ce93d8, #ff6d6d);
+  background-size: 400% 100%; animation: rainbow-flow 3s linear infinite;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── 收起触发球 ── */
+#floating-ball {
+  position: relative; width: 44px; height: 44px; border-radius: 50%;
+  flex-shrink: 0; cursor: pointer; touch-action: manipulation;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+#floating-ball:active { transform: scale(0.95); }
+#floating-ball .ball-icon { width: 24px; height: 24px; pointer-events: none; }
+#floating-ball .ball-ring {
+  position: absolute; inset: -3px; border-radius: 50%; pointer-events: none;
+  border: 2px solid transparent;
+  background: linear-gradient(270deg, #ff6d6d, #ffd54f, #4fc3f7, #ce93d8, #ff6d6d) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  background-size: 400% 100%; animation: rainbow-flow 4s linear infinite;
+}
+
+/* ── 主面板（iframe 内联展开） ── */
+#main-modal {
+  position: relative; width: 100%; max-width: 100%;
+  height: var(--ka-panel-height, 480px);
+  max-height: var(--ka-panel-max, 520px);
+  min-height: 320px;
+  border-radius: var(--radius-lg); z-index: 1;
+  display: none; flex-direction: column; overflow: hidden;
+}
+#main-modal.open { display: flex; }
+#main-modal .modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+}
+#main-modal .modal-title {
+  font-family: var(--font-art); font-size: 15px; color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(255,213,79,0.4); letter-spacing: 0.08em;
+}
+
+/* ── 搜索栏 ── */
+.search-container { padding: var(--space-sm) var(--space-lg); flex-shrink: 0; }
+#search-input {
+  width: 100%; height: 38px; padding: 0 36px 0 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary); font-size: 14px; font-family: var(--font-body);
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+#search-input:focus {
+  border-color: rgba(255,213,79,0.4);
+  box-shadow: 0 0 12px rgba(255,213,79,0.15);
+}
+#search-input::placeholder { color: rgba(255,255,255,0.25); }
+.search-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.1); color: var(--text-secondary);
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+  font-size: 12px; padding: 0;
+}
+.search-clear.visible { display: flex; }
+
+/* ── 分类标签 ── */
+.category-tabs {
+  display: flex; gap: 6px; padding: var(--space-sm) var(--space-lg);
+  overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.category-tab {
+  flex-shrink: 0; padding: 5px 12px; border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+  color: var(--text-secondary); font-size: 12px; font-family: var(--font-body);
+  cursor: pointer; white-space: nowrap; transition: all 0.2s;
+}
+.category-tab.active {
+  background: rgba(255,213,79,0.15); border-color: rgba(255,213,79,0.3);
+  color: var(--text-accent);
+}
+.category-tab:active { transform: scale(0.95); }
+
+/* ── 条目列表 ── */
+.entry-list {
+  flex: 1; overflow-y: auto; padding: var(--space-sm) var(--space-lg);
+  -webkit-overflow-scrolling: touch;
+}
+.entry-list::-webkit-scrollbar { width: 3px; }
+.entry-list::-webkit-scrollbar-track { background: transparent; }
+.entry-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* ── 条目卡片 ── */
+.entry-card {
+  display: flex; align-items: center; gap: var(--space-md);
+  padding: var(--space-md); margin-bottom: var(--space-sm);
+  border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03); cursor: pointer;
+  transition: all 0.2s; position: relative; overflow: hidden; min-height: 48px;
+}
+.entry-card:active { transform: scale(0.98); background: rgba(255,255,255,0.06); }
+.entry-card .card-indicator { width: 3px; height: 28px; border-radius: 3px; flex-shrink: 0; }
+.entry-card .card-indicator.ind-common { background: var(--rarity-common); }
+.entry-card .card-indicator.ind-rare { background: var(--rarity-rare); box-shadow: 0 0 6px var(--rarity-rare-glow); }
+.entry-card .card-indicator.ind-epic { background: var(--rarity-epic); box-shadow: 0 0 8px var(--rarity-epic-glow); }
+.entry-card .card-indicator.ind-legendary { background: var(--rarity-legendary); box-shadow: 0 0 10px var(--rarity-legendary-glow); }
+.entry-card .card-indicator.ind-mythic {
+  background: linear-gradient(180deg, #ff6d6d, #ffd54f, #4fc3f7, #ce93d8);
+  background-size: 100% 300%; animation: rainbow-flow 3s linear infinite;
+  box-shadow: 0 0 12px rgba(255,109,109,0.5);
+}
+.entry-card .card-info { flex: 1; min-width: 0; }
+.entry-card .card-name {
+  font-family: var(--font-art); font-size: 14px; line-height: 1.3; word-break: break-all;
+}
+.entry-card .card-keys { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.entry-card .card-key-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.06); color: var(--text-secondary);
+  white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis;
+}
+.entry-card .card-arrow {
+  flex-shrink: 0; width: 16px; height: 16px; color: var(--text-secondary); opacity: 0.5;
+}
+
+/* ── 详情模态框 ── */
+#detail-modal {
+  position: fixed; inset: 0; z-index: 100000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+#detail-modal.open { opacity: 1; pointer-events: auto; }
+#detail-modal .detail-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+}
+#detail-modal .detail-card {
+  position: relative; width: calc(100% - 48px); max-width: 380px;
+  padding: var(--space-xl); border-radius: var(--radius-lg); text-align: center;
+}
+#detail-modal .detail-name {
+  font-family: var(--font-art); font-size: 18px; margin-bottom: var(--space-md);
+}
+#detail-modal .detail-keywords {
+  display: flex; flex-wrap: wrap; gap: var(--space-sm); justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+#detail-modal .detail-keyword-btn {
+  padding: 8px 16px; border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08);
+  color: var(--text-primary); font-size: 13px; font-family: var(--font-body);
+  cursor: pointer; transition: all 0.2s; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+#detail-modal .detail-keyword-btn:active {
+  background: rgba(255,213,79,0.2); border-color: rgba(255,213,79,0.4); transform: scale(0.95);
+}
+#detail-modal .detail-close {
+  margin-top: var(--space-md); width: 100%; height: 40px;
+  border-radius: var(--radius-full); border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); color: var(--text-secondary);
+  font-size: 13px; cursor: pointer;
+}
+
+/* ── 字体设置模态框 ── */
+#font-modal {
+  position: fixed; inset: 0; z-index: 100001;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+#font-modal.open { opacity: 1; pointer-events: auto; }
+#font-modal .font-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+}
+#font-modal .font-panel {
+  position: relative; width: calc(100% - 48px); max-width: 380px;
+  padding: var(--space-xl); border-radius: var(--radius-lg);
+  max-height: min(70%, var(--ka-panel-max, 520px)); overflow-y: auto;
+}
+#font-modal .font-panel-title {
+  font-family: var(--font-art); font-size: 16px; color: var(--text-primary);
+  text-align: center; margin-bottom: var(--space-lg);
+}
+.font-control-group { margin-bottom: var(--space-lg); }
+.font-control-group label {
+  display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: var(--space-xs);
+}
+.font-control-group input[type="range"] {
+  width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.15); border-radius: 2px; outline: none;
+}
+.font-control-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--text-accent); cursor: pointer;
+  box-shadow: 0 0 8px rgba(255,213,79,0.4);
+}
+.font-control-group input[type="color"] {
+  width: 100%; height: 36px; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
+  cursor: pointer; padding: 2px;
+}
+.font-preview {
+  padding: var(--space-md); border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);
+  text-align: center; margin-bottom: var(--space-lg);
+}
+.font-preview-text { font-family: var(--font-art); line-height: 1.4; }
+.font-reset-btn, .font-close-btn {
+  width: 100%; height: 40px; border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+  color: var(--text-secondary); font-size: 13px; cursor: pointer; margin-top: var(--space-sm);
+}
+
+/* ── 通知提示 ── */
+#toast-container {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 100002; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.toast {
+  padding: 10px 20px; border-radius: var(--radius-full);
+  background: rgba(20,20,35,0.85); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary);
+  font-size: 13px; text-align: center; max-width: 300px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in forwards;
+  animation-delay: 0s, 1.8s; pointer-events: auto;
+}
+.toast.success { border-color: rgba(79,195,247,0.3); }
+.toast.error { border-color: rgba(255,109,109,0.3); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-12px); }
+}
+
+/* ── 空状态 ── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; color: var(--text-secondary); text-align: center;
+}
+.empty-state .empty-icon { width: 40px; height: 40px; margin-bottom: var(--space-md); opacity: 0.3; }
+.empty-state .empty-text { font-size: 13px; line-height: 1.5; }
+
+/* ── 响应式 ── */
+@media (max-width: 360px) {
+  .category-tab { font-size: 11px; padding: 4px 10px; }
+  .entry-card .card-name { font-size: 13px; }
+}
+</style>
+<script>window.__KEYWORD_INDEX__=[
+  {
+    "name": "心之友",
+    "keys": [
+      "心之友",
+      "ego",
+      "式神"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 200,
+    "selective": true,
+    "disabled": false,
+    "uid": 0
+  },
+  {
+    "name": "巧匠术式",
+    "keys": [
+      "巧匠",
+      "巧匠术式",
+      "百宝袋",
+      "连抽打"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 187,
+    "selective": true,
+    "disabled": false,
+    "uid": 1
+  },
+  {
+    "name": "有性无形之手",
+    "keys": [
+      "有性无形之手",
+      "无形之手",
+      "销赃空间"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 188,
+    "selective": true,
+    "disabled": false,
+    "uid": 2
+  },
+  {
+    "name": "三幻神（配合游戏王使用）",
+    "keys": [
+      "三幻神",
+      "决斗之仪",
+      "欧西里斯",
+      "欧贝利斯克",
+      "拉的翼神龙"
+    ],
+    "category": "游戏联动",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 141,
+    "selective": true,
+    "disabled": false,
+    "uid": 3
+  },
+  {
+    "name": "游戏王",
+    "keys": [
+      "决斗之仪",
+      "游戏王",
+      "怪兽卡",
+      "陷阱卡"
+    ],
+    "category": "游戏联动",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 140,
+    "selective": true,
+    "disabled": false,
+    "uid": 4
+  },
+  {
+    "name": "无我法相",
+    "keys": [
+      "无我法相",
+      "转生体",
+      "自我边界"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 201,
+    "selective": true,
+    "disabled": false,
+    "uid": 5
+  },
+  {
+    "name": "杀意之光",
+    "keys": [
+      "杀意之光",
+      "杀意共鸣",
+      "光术式"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 189,
+    "selective": true,
+    "disabled": false,
+    "uid": 6
+  },
+  {
+    "name": "假世真界预取身",
+    "keys": [
+      "假世真界预取身",
+      "假世界",
+      "平行因果"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 174,
+    "selective": true,
+    "disabled": false,
+    "uid": 7
+  },
+  {
+    "name": "天魔变",
+    "keys": [
+      "天魔变",
+      "天魔劲",
+      "第六天魔王"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 198,
+    "selective": true,
+    "disabled": false,
+    "uid": 10
+  },
+  {
+    "name": "武极",
+    "keys": [
+      "武极",
+      "拳罡",
+      "一拳破万法"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 204,
+    "selective": true,
+    "disabled": false,
+    "uid": 11
+  },
+  {
+    "name": "奏恶灭音",
+    "keys": [
+      "奏恶灭音",
+      "实质化的恶意",
+      "音波攻击"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 203,
+    "selective": true,
+    "disabled": false,
+    "uid": 15
+  },
+  {
+    "name": "因果逆转",
+    "keys": [
+      "因果逆转",
+      "顺逆皆杀之座"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 169,
+    "selective": true,
+    "disabled": false,
+    "uid": 17
+  },
+  {
+    "name": "定数倍增",
+    "keys": [
+      "定数倍增",
+      "Base Multiplier"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 170,
+    "selective": true,
+    "disabled": false,
+    "uid": 19
+  },
+  {
+    "name": "小数点",
+    "keys": [
+      "小数点",
+      "Decimal Shift"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 171,
+    "selective": true,
+    "disabled": false,
+    "uid": 20
+  },
+  {
+    "name": "幻兽琥珀",
+    "keys": [
+      "幻兽琥珀",
+      "雷电操控",
+      "肉体改造"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 210,
+    "selective": true,
+    "disabled": false,
+    "uid": 21
+  },
+  {
+    "name": "洞悉咒法",
+    "keys": [
+      "洞悉咒法",
+      "八卦",
+      "吉位",
+      "凶位"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 154,
+    "selective": true,
+    "disabled": false,
+    "uid": 22
+  },
+  {
+    "name": "五行咒法",
+    "keys": [
+      "五行咒法",
+      "奇门局",
+      "五行八卦"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 152,
+    "selective": true,
+    "disabled": false,
+    "uid": 23
+  },
+  {
+    "name": "滥觞与止境",
+    "keys": [
+      "滥觞",
+      "止境",
+      "滥觞与止境"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 172,
+    "selective": true,
+    "disabled": false,
+    "uid": 24
+  },
+  {
+    "name": "百分百被空手接白刃！",
+    "keys": [
+      "百分百被空手接白刃",
+      "强剑",
+      "空手接白刃"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 180,
+    "selective": true,
+    "disabled": false,
+    "uid": 27
+  },
+  {
+    "name": "笺",
+    "keys": [
+      "咒纸",
+      "纸人"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 219,
+    "selective": true,
+    "disabled": false,
+    "uid": 28
+  },
+  {
+    "name": "乱空",
+    "keys": [
+      "乱空",
+      "咫尺",
+      "天涯",
+      "空间褶皱"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 173,
+    "selective": true,
+    "disabled": false,
+    "uid": 29
+  },
+  {
+    "name": "全知之书",
+    "keys": [
+      "全知之书",
+      "情报之书"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 179,
+    "selective": true,
+    "disabled": false,
+    "uid": 30
+  },
+  {
+    "name": "虚构电磁学",
+    "keys": [
+      "虚构电磁学",
+      "生物电场",
+      "电磁现象"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 191,
+    "selective": true,
+    "disabled": false,
+    "uid": 31
+  },
+  {
+    "name": "当年假设山海图",
+    "keys": [
+      "当年假设山海图",
+      "山海图",
+      "拓印"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 153,
+    "selective": true,
+    "disabled": false,
+    "uid": 32
+  },
+  {
+    "name": "萃散（伊吹翠香）",
+    "keys": [
+      "萃散",
+      "伊吹翠香",
+      "凝缩",
+      "扩散"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 218,
+    "selective": true,
+    "disabled": false,
+    "uid": 38
+  },
+  {
+    "name": "缚骨裁衣",
+    "keys": [
+      "缚骨裁衣",
+      "锦绣褫衣阁"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 216,
+    "selective": true,
+    "disabled": false,
+    "uid": 39
+  },
+  {
+    "name": "贽錾之柩",
+    "keys": [
+      "贽錾之柩",
+      "錾刻",
+      "骨制器具"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 217,
+    "selective": true,
+    "disabled": false,
+    "uid": 40
+  },
+  {
+    "name": "骑士不死于徒手",
+    "keys": [
+      "骑士不死于徒手",
+      "万物兵装"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 101,
+    "selective": true,
+    "disabled": false,
+    "uid": 41
+  },
+  {
+    "name": "假面骑士龙骑",
+    "keys": [
+      "镜界投影",
+      "龙骑",
+      "镜像空间"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 113,
+    "selective": true,
+    "disabled": false,
+    "uid": 42
+  },
+  {
+    "name": "伊塔库亚之血",
+    "keys": [
+      "伊塔库亚之血",
+      "风之子",
+      "旧日支配者"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 194,
+    "selective": true,
+    "disabled": false,
+    "uid": 44
+  },
+  {
+    "name": "伊塔库亚DLC",
+    "keys": [
+      "伊塔库亚DLC",
+      "风之陨落",
+      "伊塔库亚的阴影"
+    ],
+    "category": "DLC扩展",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 195,
+    "selective": true,
+    "disabled": false,
+    "uid": 45
+  },
+  {
+    "name": "原色光",
+    "keys": [
+      "原色光",
+      "光属性"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 190,
+    "selective": true,
+    "disabled": false,
+    "uid": 46
+  },
+  {
+    "name": "天狩术式2.0",
+    "keys": [
+      "天狩术式2.0",
+      "天狩",
+      "威灵",
+      "天弓"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 205,
+    "selective": true,
+    "disabled": false,
+    "uid": 47
+  },
+  {
+    "name": "假面骑士电王",
+    "keys": [
+      "异轨憑依",
+      "电王",
+      "时之客舱",
+      "意象咒灵"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 114,
+    "selective": true,
+    "disabled": false,
+    "uid": 49
+  },
+  {
+    "name": "美食的俘虏",
+    "keys": [
+      "美食猎人",
+      "美食恶魔",
+      "美食细胞"
+    ],
+    "category": "Jump系",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 129,
+    "selective": true,
+    "disabled": false,
+    "uid": 50
+  },
+  {
+    "name": "斩魄刀",
+    "keys": [
+      "十方业物",
+      "斩魄刀",
+      "魄碎"
+    ],
+    "category": "死神",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 132,
+    "selective": true,
+    "disabled": false,
+    "uid": 51
+  },
+  {
+    "name": "情报术者",
+    "keys": [
+      "情报术者",
+      "完全情报",
+      "信息迭代"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 178,
+    "selective": true,
+    "disabled": false,
+    "uid": 53
+  },
+  {
+    "name": "钢卷操术",
+    "keys": [
+      "钢卷操术",
+      "钢卷",
+      "工业规格"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 199,
+    "selective": true,
+    "disabled": false,
+    "uid": 55
+  },
+  {
+    "name": "茶道",
+    "keys": [
+      "茶道",
+      "茶道呼吸法",
+      "和敬清寂"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 142,
+    "selective": true,
+    "disabled": false,
+    "uid": 56
+  },
+  {
+    "name": "天彗龙",
+    "keys": [
+      "天彗龙",
+      "龙气玉",
+      "赫色龙气玉"
+    ],
+    "category": "怪物猎人",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 196,
+    "selective": true,
+    "disabled": false,
+    "uid": 58
+  },
+  {
+    "name": "溶解操术",
+    "keys": [
+      "溶解操控",
+      "溶解操术",
+      "介质相性"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 207,
+    "selective": true,
+    "disabled": false,
+    "uid": 60
+  },
+  {
+    "name": "铁球回旋（战技）",
+    "keys": [
+      "回旋技术",
+      "铁球回旋",
+      "黄金矩形"
+    ],
+    "category": "战技",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 206,
+    "selective": true,
+    "disabled": false,
+    "uid": 61
+  },
+  {
+    "name": "镜花水月（Token多）",
+    "keys": [
+      "镜花水月",
+      "认知篡改",
+      "五感支配"
+    ],
+    "category": "死神",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 215,
+    "selective": true,
+    "disabled": false,
+    "uid": 64
+  },
+  {
+    "name": "黑崎一护",
+    "keys": [
+      "混血王座",
+      "黑崎一护",
+      "死神",
+      "三界共主"
+    ],
+    "category": "死神",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 133,
+    "selective": true,
+    "disabled": false,
+    "uid": 66
+  },
+  {
+    "name": "约会大作战",
+    "keys": [
+      "质点受胎",
+      "约会大作战",
+      "卡巴拉",
+      "Kether"
+    ],
+    "category": "约会大作战",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 135,
+    "selective": true,
+    "disabled": false,
+    "uid": 67
+  },
+  {
+    "name": "天之伤疮3.0",
+    "keys": [
+      "天之伤疮3.0",
+      "天之伤疮",
+      "电磁波支配"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 192,
+    "selective": true,
+    "disabled": false,
+    "uid": 70
+  },
+  {
+    "name": "时髦度",
+    "keys": [
+      "言诠倒错",
+      "时髦度",
+      "气场共鸣"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 177,
+    "selective": true,
+    "disabled": false,
+    "uid": 71
+  },
+  {
+    "name": "假面骑士Amazons",
+    "keys": [
+      "亚马逊始祖",
+      "Amazon细胞",
+      "Amazons"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 115,
+    "selective": true,
+    "disabled": false,
+    "uid": 72
+  },
+  {
+    "name": "灭龙魔法",
+    "keys": [
+      "灭龙术式",
+      "炎龙",
+      "龙之种",
+      "Dragon Slayer"
+    ],
+    "category": "妖精的尾巴",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 128,
+    "selective": true,
+    "disabled": false,
+    "uid": 73
+  },
+  {
+    "name": "假面骑士BLACK RX",
+    "keys": [
+      "太阳之子",
+      "帝王石",
+      "BLACK RX"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 116,
+    "selective": true,
+    "disabled": false,
+    "uid": 74
+  },
+  {
+    "name": "奈克斯特奥特曼",
+    "keys": [
+      "光臨凭依",
+      "奈克斯特",
+      "奈克斯特奥特曼",
+      "Next"
+    ],
+    "category": "奥特曼",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 138,
+    "selective": true,
+    "disabled": false,
+    "uid": 75
+  },
+  {
+    "name": "配合假面骑士时必开",
+    "keys": [
+      "假面骑士",
+      "Henshin",
+      "骑士变身",
+      "变身台词"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 100,
+    "selective": true,
+    "disabled": false,
+    "uid": 76
+  },
+  {
+    "name": "假面骑士空我",
+    "keys": [
+      "空我",
+      "亚玛达姆",
+      "亚古鲁",
+      "封印能量"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 112,
+    "selective": true,
+    "disabled": false,
+    "uid": 77
+  },
+  {
+    "name": "假面骑士faiz",
+    "keys": [
+      "Faiz系统",
+      "光子血液",
+      "faiz",
+      "奥菲以诺"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 117,
+    "selective": true,
+    "disabled": false,
+    "uid": 78
+  },
+  {
+    "name": "鲲鹏变（新版）",
+    "keys": [
+      "鲲鹏变",
+      "天罡三十六变",
+      "鲲鹏"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 163,
+    "selective": true,
+    "disabled": false,
+    "uid": 79
+  },
+  {
+    "name": "青龙（新版）",
+    "keys": [
+      "青龙变",
+      "天罡三十六变",
+      "青龙"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 164,
+    "selective": true,
+    "disabled": false,
+    "uid": 80
+  },
+  {
+    "name": "嫦娥（新版）",
+    "keys": [
+      "嫦娥仙职",
+      "嫦娥",
+      "太阴一脉"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 162,
+    "selective": true,
+    "disabled": false,
+    "uid": 81
+  },
+  {
+    "name": "地藏王（新版）",
+    "keys": [
+      "地藏王",
+      "幽冥一脉",
+      "地府神职"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 161,
+    "selective": true,
+    "disabled": false,
+    "uid": 82
+  },
+  {
+    "name": "贾诩（新版）",
+    "keys": [
+      "文和乱武",
+      "贾诩",
+      "毒士"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 157,
+    "selective": true,
+    "disabled": false,
+    "uid": 83
+  },
+  {
+    "name": "吕布（新版）",
+    "keys": [
+      "飞将",
+      "吕布新版",
+      "方天画戟",
+      "赤兔马"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 158,
+    "selective": true,
+    "disabled": false,
+    "uid": 84
+  },
+  {
+    "name": "诸葛孔明（新版）",
+    "keys": [
+      "武侯",
+      "诸葛孔明",
+      "诸葛亮"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 155,
+    "selective": true,
+    "disabled": false,
+    "uid": 85
+  },
+  {
+    "name": "韩信（新版）",
+    "keys": [
+      "淮阴统御",
+      "韩信",
+      "多多益善"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 156,
+    "selective": true,
+    "disabled": false,
+    "uid": 86
+  },
+  {
+    "name": "咫尺天涯（新版）",
+    "keys": [
+      "咫尺天涯",
+      "天罡三十六术",
+      "空间折叠"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 165,
+    "selective": true,
+    "disabled": false,
+    "uid": 87
+  },
+  {
+    "name": "修罗之身（新版）",
+    "keys": [
+      "修罗之身",
+      "地煞七十二变",
+      "修罗道"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 166,
+    "selective": true,
+    "disabled": false,
+    "uid": 88
+  },
+  {
+    "name": "天魔邪火（新版）",
+    "keys": [
+      "天魔邪火",
+      "地煞七十二术",
+      "天魔道"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 167,
+    "selective": true,
+    "disabled": false,
+    "uid": 89
+  },
+  {
+    "name": "禹皇（新版）",
+    "keys": [
+      "禹皇",
+      "大禹",
+      "开山斧"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 159,
+    "selective": true,
+    "disabled": false,
+    "uid": 91
+  },
+  {
+    "name": "黄帝（新版）",
+    "keys": [
+      "黄帝",
+      "轩辕",
+      "初始之帝"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 160,
+    "selective": true,
+    "disabled": false,
+    "uid": 92
+  },
+  {
+    "name": "忍者杀手",
+    "keys": [
+      "咒业杀手",
+      "忍者杀手",
+      "种火"
+    ],
+    "category": "忍者杀手",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 130,
+    "selective": true,
+    "disabled": false,
+    "uid": 93
+  },
+  {
+    "name": "忍者杀手DLC",
+    "keys": [
+      "忍者杀手DLC",
+      "因果之战",
+      "咒业杀手"
+    ],
+    "category": "DLC扩展",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 131,
+    "selective": true,
+    "disabled": false,
+    "uid": 94
+  },
+  {
+    "name": "震震果实（新版）",
+    "keys": [
+      "震震术式",
+      "震震果实",
+      "振动掌握"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 126,
+    "selective": true,
+    "disabled": false,
+    "uid": 95
+  },
+  {
+    "name": "奥特曼（新版）",
+    "keys": [
+      "光之咒缚",
+      "奥特曼",
+      "光之巨人"
+    ],
+    "category": "奥特曼",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 137,
+    "selective": true,
+    "disabled": false,
+    "uid": 96
+  },
+  {
+    "name": "赛亚人（新版）",
+    "keys": [
+      "闘魂基因",
+      "赛亚人",
+      "Sⁿ细胞"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 118,
+    "selective": true,
+    "disabled": false,
+    "uid": 97
+  },
+  {
+    "name": "我收服宝可梦了！（新版）",
+    "keys": [
+      "灵操结界",
+      "Mononoke Binder",
+      "宝可梦",
+      "魂缚之契"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 136,
+    "selective": true,
+    "disabled": false,
+    "uid": 98
+  },
+  {
+    "name": "沙鲁（咒物，新版）",
+    "keys": [
+      "完殖胚胎",
+      "沙鲁",
+      "咒胎九相"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 124,
+    "selective": true,
+    "disabled": false,
+    "uid": 99
+  },
+  {
+    "name": "污秽剥夺（新版）",
+    "keys": [
+      "污秽剥夺",
+      "圣约密宗",
+      "绝罚令"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 222,
+    "selective": true,
+    "disabled": false,
+    "uid": 100
+  },
+  {
+    "name": "子爵骑士（新版）",
+    "keys": [
+      "子爵骑士",
+      "荆棘铁壁",
+      "欧洲骑士道"
+    ],
+    "category": "新版术式",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 223,
+    "selective": true,
+    "disabled": false,
+    "uid": 101
+  },
+  {
+    "name": "超级赤血操术",
+    "keys": [
+      "赫血操艺",
+      "超级赤血操术",
+      "血液支配"
+    ],
+    "category": "咒术回战",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 211,
+    "selective": true,
+    "disabled": false,
+    "uid": 102
+  },
+  {
+    "name": "爵银龙",
+    "keys": [
+      "爵银龙",
+      "红血玉",
+      "メル・ゼナ"
+    ],
+    "category": "怪物猎人",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 224,
+    "selective": true,
+    "disabled": false,
+    "uid": 103
+  },
+  {
+    "name": "魔人布欧（咒灵，新版）",
+    "keys": [
+      "万变星辰",
+      "魔人布欧",
+      "粉色咒灵"
+    ],
+    "category": "新版术式",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 125,
+    "selective": true,
+    "disabled": false,
+    "uid": 104
+  },
+  {
+    "name": "蛇王龙",
+    "keys": [
+      "蛇王龙",
+      "龙玉",
+      "千剑的龙神玉"
+    ],
+    "category": "怪物猎人",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 225,
+    "selective": true,
+    "disabled": false,
+    "uid": 105
+  },
+  {
+    "name": "命运术式",
+    "keys": [
+      "赞美歌",
+      "命运术式",
+      "Hymn",
+      "因果扫描"
+    ],
+    "category": "特殊能力",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 175,
+    "selective": true,
+    "disabled": false,
+    "uid": 106
+  },
+  {
+    "name": "强欲大罪司教",
+    "keys": [
+      "寂静王冠",
+      "强欲大罪司教",
+      "绝对不变"
+    ],
+    "category": "特殊能力",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 143,
+    "selective": true,
+    "disabled": false,
+    "uid": 108
+  },
+  {
+    "name": "外星蜥蜴人",
+    "keys": [
+      "奇塔瑞",
+      "外星蜥蜴人",
+      "Chitauri"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 144,
+    "selective": true,
+    "disabled": false,
+    "uid": 109
+  },
+  {
+    "name": "恶魔布罗利-人物档案",
+    "keys": [
+      "戈莱·德莱",
+      "恶魔布罗利",
+      "Gorai Dorai"
+    ],
+    "category": "龙珠",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 229,
+    "selective": true,
+    "disabled": false,
+    "uid": 110
+  },
+  {
+    "name": "恶魔布罗利-术式",
+    "keys": [
+      "闘魂基因·伝説変異",
+      "伝説変異",
+      "神骸暴走"
+    ],
+    "category": "龙珠",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 119,
+    "selective": true,
+    "disabled": false,
+    "uid": 111
+  },
+  {
+    "name": "恶魔布罗利-体质",
+    "keys": [
+      "伝説の神骸",
+      "Legendary God Remnant"
+    ],
+    "category": "龙珠",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 120,
+    "selective": true,
+    "disabled": false,
+    "uid": 112
+  },
+  {
+    "name": "恶魔布罗利-战技",
+    "keys": [
+      "荒神滅殺法",
+      "強制伝説化"
+    ],
+    "category": "龙珠",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 121,
+    "selective": true,
+    "disabled": false,
+    "uid": 113
+  },
+  {
+    "name": "咒灵娘化",
+    "keys": [
+      "操咒灵术",
+      "咒灵娘化",
+      "灵魂重塑"
+    ],
+    "category": "咒灵/反派",
+    "rarity": "common",
+    "depth": 4,
+    "order": 214,
+    "selective": true,
+    "disabled": false,
+    "uid": 115
+  },
+  {
+    "name": "天气预报（更贴合原著）",
+    "keys": [
+      "天气预报",
+      "Weather Report",
+      "大气操纵"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 193,
+    "selective": true,
+    "disabled": false,
+    "uid": 117
+  },
+  {
+    "name": "异能之火",
+    "keys": [
+      "异能之火",
+      "精神之火",
+      "异能生成"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 208,
+    "selective": true,
+    "disabled": false,
+    "uid": 119
+  },
+  {
+    "name": "机械真理",
+    "keys": [
+      "机械真理",
+      "规则干涉"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 185,
+    "selective": true,
+    "disabled": false,
+    "uid": 120
+  },
+  {
+    "name": "维特鲁姆智能粒子",
+    "keys": [
+      "智能粒子",
+      "维特鲁姆",
+      "Viltrum"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 209,
+    "selective": true,
+    "disabled": false,
+    "uid": 121
+  },
+  {
+    "name": "哼，想逃？闪电旋风劈！",
+    "keys": [
+      "流星追猎",
+      "闪电旋风劈",
+      "坠机"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 123,
+    "selective": true,
+    "disabled": false,
+    "uid": 124
+  },
+  {
+    "name": "神秘悟饭-潜力解放",
+    "keys": [
+      "潜能解放·界限归真",
+      "潜能解放"
+    ],
+    "category": "龙珠",
+    "rarity": "common",
+    "depth": 4,
+    "order": 122,
+    "selective": true,
+    "disabled": false,
+    "uid": 125
+  },
+  {
+    "name": "铠甲勇士前置术式（光影传奇）",
+    "keys": [
+      "铠甲勇士",
+      "五行血脉",
+      "光影传奇",
+      "光影石"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 102,
+    "selective": true,
+    "disabled": false,
+    "uid": 126
+  },
+  {
+    "name": "炎龙侠",
+    "keys": [
+      "炎龙侠",
+      "炎龙铠甲",
+      "炎龙召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 103,
+    "selective": true,
+    "disabled": false,
+    "uid": 127
+  },
+  {
+    "name": "风鹰侠",
+    "keys": [
+      "风鹰侠",
+      "风鹰铠甲",
+      "风鹰召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 104,
+    "selective": true,
+    "disabled": false,
+    "uid": 128
+  },
+  {
+    "name": "地虎侠",
+    "keys": [
+      "地虎侠",
+      "地虎铠甲",
+      "地虎召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 105,
+    "selective": true,
+    "disabled": false,
+    "uid": 129
+  },
+  {
+    "name": "黑犀侠",
+    "keys": [
+      "黑犀侠",
+      "黑犀铠甲",
+      "黑犀召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 106,
+    "selective": true,
+    "disabled": false,
+    "uid": 130
+  },
+  {
+    "name": "雪獒侠",
+    "keys": [
+      "雪獒侠",
+      "雪獒铠甲",
+      "雪獒召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 107,
+    "selective": true,
+    "disabled": false,
+    "uid": 131
+  },
+  {
+    "name": "帝皇侠",
+    "keys": [
+      "帝皇侠",
+      "帝皇铠甲",
+      "五行合一"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 108,
+    "selective": true,
+    "disabled": false,
+    "uid": 132
+  },
+  {
+    "name": "修罗铠甲",
+    "keys": [
+      "修罗铠甲",
+      "修罗合体",
+      "修罗召唤器"
+    ],
+    "category": "铠甲勇士",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 109,
+    "selective": true,
+    "disabled": false,
+    "uid": 133
+  },
+  {
+    "name": "僵尸在你的草地上（pvz）",
+    "keys": [
+      "有僵尸在你的草地上",
+      "植物大战僵尸",
+      "Zombies on your Lawn"
+    ],
+    "category": "游戏联动",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 139,
+    "selective": true,
+    "disabled": false,
+    "uid": 134
+  },
+  {
+    "name": "三色霸气（海贼王）",
+    "keys": [
+      "绝咒霸体",
+      "霸气",
+      "三色霸气",
+      "天与咒缚"
+    ],
+    "category": "Jump系",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 127,
+    "selective": true,
+    "disabled": false,
+    "uid": 136
+  },
+  {
+    "name": "空想具现",
+    "keys": [
+      "空想具现",
+      "Imagination Manifestation"
+    ],
+    "category": "特殊能力",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 149,
+    "selective": true,
+    "disabled": false,
+    "uid": 137
+  },
+  {
+    "name": "游戏大轮盘",
+    "keys": [
+      "游戏大轮盘",
+      "Game Roulette"
+    ],
+    "category": "游戏联动",
+    "rarity": "common",
+    "depth": 4,
+    "order": 181,
+    "selective": true,
+    "disabled": false,
+    "uid": 138
+  },
+  {
+    "name": "神秘复苏",
+    "keys": [
+      "厉鬼拼图",
+      "神秘复苏",
+      "灵异咒力"
+    ],
+    "category": "特殊能力",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 145,
+    "selective": true,
+    "disabled": false,
+    "uid": 139
+  },
+  {
+    "name": "魔女",
+    "keys": [
+      "魔女",
+      "Demoness",
+      "原初阴性咒力"
+    ],
+    "category": "特殊能力",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 147,
+    "selective": true,
+    "disabled": false,
+    "uid": 140
+  },
+  {
+    "name": "改字术式",
+    "keys": [
+      "解律篡辞",
+      "改字术式",
+      "文字篡改"
+    ],
+    "category": "特殊能力",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 176,
+    "selective": true,
+    "disabled": false,
+    "uid": 141
+  },
+  {
+    "name": "九尾-九喇嘛",
+    "keys": [
+      "九相灾兽",
+      "九尾",
+      "九喇嘛",
+      "Kurama"
+    ],
+    "category": "咒灵/反派",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 146,
+    "selective": true,
+    "disabled": false,
+    "uid": 142
+  },
+  {
+    "name": "言叶无限欺",
+    "keys": [
+      "言叶无限欺",
+      "妄定",
+      "谎言倒置"
+    ],
+    "category": "特殊能力",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 148,
+    "selective": true,
+    "disabled": false,
+    "uid": 143
+  },
+  {
+    "name": "我独自升级-暗影君王",
+    "keys": [
+      "暗影君王",
+      "我独自升级",
+      "寂灭咒力"
+    ],
+    "category": "韩漫",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 134,
+    "selective": true,
+    "disabled": false,
+    "uid": 145
+  },
+  {
+    "name": "堕落母神-瞪谁谁怀孕（）",
+    "keys": [
+      "堕落母神",
+      "Mother Goddess",
+      "丰饶咒力"
+    ],
+    "category": "咒灵/反派",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 226,
+    "selective": true,
+    "disabled": false,
+    "uid": 147
+  },
+  {
+    "name": "矢量操纵",
+    "keys": [
+      "矢量操控",
+      "矢量操纵",
+      "反射"
+    ],
+    "category": "特殊能力",
+    "rarity": "mythic",
+    "depth": 4,
+    "order": 182,
+    "selective": true,
+    "disabled": false,
+    "uid": 148
+  },
+  {
+    "name": "假面骑士decade",
+    "keys": [
+      "万象覆写",
+      "极光驱动器",
+      "decade"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 111,
+    "selective": true,
+    "disabled": false,
+    "uid": 149
+  },
+  {
+    "name": "假面骑士zeztz（二改）",
+    "keys": [
+      "诅咒缠身",
+      "恐惧驱动器",
+      "zeztz"
+    ],
+    "category": "假面骑士",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 110,
+    "selective": true,
+    "disabled": false,
+    "uid": 150
+  },
+  {
+    "name": "药师兜（大蛇兜）",
+    "keys": [
+      "龙地洞",
+      "药师兜",
+      "大蛇兜",
+      "仙鳞模式"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 150,
+    "selective": true,
+    "disabled": false,
+    "uid": 151
+  },
+  {
+    "name": "十影法",
+    "keys": [
+      "十种影法术",
+      "十影法",
+      "调伏仪式",
+      "魔虚罗"
+    ],
+    "category": "咒术回战",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 213,
+    "selective": true,
+    "disabled": false,
+    "uid": 152
+  },
+  {
+    "name": "赤血操术-血铠",
+    "keys": [
+      "血铠",
+      "赤血操术",
+      "百敛",
+      "穿血"
+    ],
+    "category": "咒术回战",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 212,
+    "selective": true,
+    "disabled": false,
+    "uid": 153
+  },
+  {
+    "name": "绷住！",
+    "keys": [
+      "绷者术式",
+      "绷住",
+      "The Stoic"
+    ],
+    "category": "战技",
+    "rarity": "common",
+    "depth": 4,
+    "order": 220,
+    "selective": true,
+    "disabled": false,
+    "uid": 155
+  },
+  {
+    "name": "魂5术式",
+    "keys": [
+      "灰灭弃兵",
+      "魂5术式",
+      "原素瓶"
+    ],
+    "category": "战技",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 221,
+    "selective": true,
+    "disabled": false,
+    "uid": 157
+  },
+  {
+    "name": "虚数质量",
+    "keys": [
+      "虚数质量",
+      "废弃五条家"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 183,
+    "selective": true,
+    "disabled": false,
+    "uid": 159
+  },
+  {
+    "name": "神机百炼",
+    "keys": [
+      "神机百炼",
+      "化物",
+      "御物"
+    ],
+    "category": "原创术式",
+    "rarity": "common",
+    "depth": 4,
+    "order": 184,
+    "selective": true,
+    "disabled": false,
+    "uid": 160
+  },
+  {
+    "name": "新三国天意术式",
+    "keys": [
+      "天意术式",
+      "天意",
+      "窥探天意"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 151,
+    "selective": true,
+    "disabled": false,
+    "uid": 162
+  },
+  {
+    "name": "钢龙",
+    "keys": [
+      "钢龙",
+      "风玉",
+      "龙角"
+    ],
+    "category": "怪物猎人",
+    "rarity": "epic",
+    "depth": 4,
+    "order": 197,
+    "selective": true,
+    "disabled": false,
+    "uid": 163
+  },
+  {
+    "name": "SCP-914 万能转换机",
+    "keys": [
+      "万能转换",
+      "SCP-914",
+      "结构加工"
+    ],
+    "category": "特殊能力",
+    "rarity": "legendary",
+    "depth": 4,
+    "order": 186,
+    "selective": true,
+    "disabled": false,
+    "uid": 164
+  },
+  {
+    "name": "认祖归宗术式",
+    "keys": [
+      "祖宗体验卡",
+      "认祖归宗",
+      "宗脉溯源"
+    ],
+    "category": "原创术式",
+    "rarity": "rare",
+    "depth": 4,
+    "order": 168,
+    "selective": true,
+    "disabled": false,
+    "uid": 166
+  }
+];</script></head>
+<body>
+<script>"use strict";
+(() => {
+  // src/keyword-activator/ui/FloatingBall.ts
+  var FloatingBall = class {
+    constructor(onToggle) {
+      this.onToggle = onToggle;
+      this.el = this.create();
+      this.el.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.onToggle();
+      });
+    }
+    create() {
+      const ball = document.createElement("div");
+      ball.id = "floating-ball";
+      ball.className = "glass-heavy";
+      ball.setAttribute("role", "button");
+      ball.setAttribute("tabindex", "0");
+      ball.setAttribute("aria-label", "展开关键词激活器");
+      ball.innerHTML = `
+      <div class="ball-ring"></div>
+      <svg class="ball-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10" stroke="url(#ball-grad)" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" />
+        <defs>
+          <linearGradient id="ball-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff6d6d" />
+            <stop offset="33%" stop-color="#ffd54f" />
+            <stop offset="66%" stop-color="#4fc3f7" />
+            <stop offset="100%" stop-color="#ce93d8" />
+          </linearGradient>
+        </defs>
+      </svg>`;
+      ball.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.onToggle();
+        }
+      });
+      return ball;
+    }
+    destroy() {
+      this.el.remove();
+    }
+  };
+
+  // src/keyword-activator/data/KeywordIndex.ts
+  var INDEX_URL = "keyword-index.json";
+  var cachedIndex = null;
+  async function loadKeywordIndex() {
+    if (cachedIndex) return cachedIndex;
+    if (window.__KEYWORD_INDEX__ && window.__KEYWORD_INDEX__.length > 0) {
+      cachedIndex = window.__KEYWORD_INDEX__;
+      return cachedIndex;
+    }
+    try {
+      const resp = await fetch(INDEX_URL);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      cachedIndex = await resp.json();
+      return cachedIndex;
+    } catch (e) {
+      console.error("[KeywordIndex] \u52A0\u8F7D\u5931\u8D25:", e);
+      return [];
+    }
+  }
+  function getCategories(entries) {
+    const map = /* @__PURE__ */ new Map();
+    for (const e of entries) {
+      map.set(e.category, (map.get(e.category) || 0) + 1);
+    }
+    const result = [];
+    for (const [name, count] of map) {
+      result.push({ name, count });
+    }
+    result.sort((a, b) => b.count - a.count);
+    return result;
+  }
+  function searchEntries(entries, query, category) {
+    const q = query.trim().toLowerCase();
+    let filtered = category && category !== "\u5168\u90E8" ? entries.filter((e) => e.category === category) : entries;
+    if (!q) return filtered;
+    return filtered.filter(
+      (e) => e.name.toLowerCase().includes(q) || e.keys.some((k) => k.toLowerCase().includes(q))
+    );
+  }
+  var RARITY_ORDER = {
+    mythic: 0,
+    legendary: 1,
+    epic: 2,
+    rare: 3,
+    common: 4
+  };
+  function sortByRarity(entries) {
+    return [...entries].sort(
+      (a, b) => (RARITY_ORDER[a.rarity] ?? 5) - (RARITY_ORDER[b.rarity] ?? 5) || a.name.localeCompare(b.name, "zh")
+    );
+  }
+
+  // src/keyword-activator/utils/tavern.ts
+  function insertToTavernInput(keyword) {
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          type: "KEYWORD_ACTIVATOR_INSERT",
+          keyword
+        }, "*");
+      }
+      if (window.parent && window.parent !== window) {
+        try {
+          const $ = window.parent.$;
+          if ($) {
+            const textarea = $("#send_textarea");
+            if (textarea.length) {
+              const currentVal = textarea.val();
+              const sep = currentVal && !currentVal.endsWith(" ") ? " " : "";
+              textarea.val(currentVal + sep + keyword);
+              textarea.trigger("input");
+              textarea.focus();
+              return true;
+            }
+          }
+        } catch (_) {
+        }
+      }
+      navigator.clipboard?.writeText(keyword).catch(() => {
+      });
+      return false;
+    } catch (e) {
+      console.error("[Tavern] \u8F93\u5165\u5931\u8D25:", e);
+      return false;
+    }
+  }
+
+  // src/keyword-activator/ui/Toast.ts
+  function showToast(message, type = "success") {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toast-container";
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+      if (container && container.children.length === 0) {
+        container.remove();
+      }
+    }, 2500);
+  }
+
+  // src/keyword-activator/ui/DetailModal.ts
+  var DetailModal = class {
+    constructor(fontSettings) {
+      this.fontSettings = fontSettings;
+      this.el = this.create();
+      this.bindEvents();
+    }
+    create() {
+      const modal = document.createElement("div");
+      modal.id = "detail-modal";
+      modal.innerHTML = `
+      <div class="detail-overlay"></div>
+      <div class="detail-card glass-heavy">
+        <div class="detail-name text-art" id="detail-name"></div>
+        <div class="detail-keywords" id="detail-keywords"></div>
+        <button class="detail-close">\u5173\u95ED</button>
+      </div>`;
+      return modal;
+    }
+    bindEvents() {
+      const overlay = this.el.querySelector(".detail-overlay");
+      const closeBtn = this.el.querySelector(".detail-close");
+      overlay.addEventListener("click", () => this.close());
+      closeBtn.addEventListener("click", () => this.close());
+    }
+    show(entry) {
+      const nameEl = this.el.querySelector("#detail-name");
+      nameEl.textContent = entry.name;
+      nameEl.className = `detail-name text-art rarity-${entry.rarity}`;
+      const keywordsEl = this.el.querySelector("#detail-keywords");
+      keywordsEl.innerHTML = "";
+      for (const key of entry.keys) {
+        const btn = document.createElement("button");
+        btn.className = "detail-keyword-btn";
+        btn.textContent = key;
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.activateKeyword(key);
+        });
+        keywordsEl.appendChild(btn);
+      }
+      document.body.appendChild(this.el);
+      requestAnimationFrame(() => this.el.classList.add("open"));
+    }
+    activateKeyword(keyword) {
+      const success = insertToTavernInput(keyword);
+      if (success) {
+        showToast(`\u300C${keyword}\u300D\u5DF2\u586B\u5165\u8F93\u5165\u6846`, "success");
+      } else {
+        showToast(`\u300C${keyword}\u300D\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F`, "info");
+      }
+      this.close();
+    }
+    close() {
+      this.el.classList.remove("open");
+      setTimeout(() => this.el.remove(), 300);
+    }
+    updateFontSettings(s) {
+      this.fontSettings = s;
+    }
+  };
+
+  // src/keyword-activator/types/index.ts
+  var DEFAULT_FONT_SETTINGS = {
+    size: 14,
+    glowColor: "#ffd54f",
+    glowIntensity: 60,
+    strokeWidth: 1,
+    textColor: "#f0e6d3"
+  };
+
+  // src/keyword-activator/ui/FontSettings.ts
+  var FontSettingsModal = class {
+    constructor(initial, onChange) {
+      this.settings = { ...DEFAULT_FONT_SETTINGS, ...initial };
+      this.onChange = onChange;
+      this.el = this.create();
+      this.bindEvents();
+    }
+    create() {
+      const modal = document.createElement("div");
+      modal.id = "font-modal";
+      modal.innerHTML = `
+      <div class="font-overlay"></div>
+      <div class="font-panel glass-heavy">
+        <div class="font-panel-title text-art">\u5B57\u4F53\u8BBE\u7F6E</div>
+        <div class="font-preview">
+          <div class="font-preview-text" id="font-preview-text">\u5492\u672F\u56DE\u6218 \u5173\u952E\u8BCD\u6FC0\u6D3B</div>
+        </div>
+        <div class="font-control-group">
+          <label>\u5B57\u4F53\u5927\u5C0F <span id="font-size-val">14</span>px</label>
+          <input type="range" id="font-size-slider" min="11" max="22" value="14" step="1">
+        </div>
+        <div class="font-control-group">
+          <label>\u6587\u5B57\u989C\u8272</label>
+          <input type="color" id="font-color-picker" value="#f0e6d3">
+        </div>
+        <div class="font-control-group">
+          <label>\u53D1\u5149\u989C\u8272</label>
+          <input type="color" id="font-glow-picker" value="#ffd54f">
+        </div>
+        <div class="font-control-group">
+          <label>\u53D1\u5149\u5F3A\u5EA6 <span id="font-glow-val">60</span></label>
+          <input type="range" id="font-glow-slider" min="0" max="100" value="60" step="5">
+        </div>
+        <div class="font-control-group">
+          <label>\u63CF\u8FB9\u5BBD\u5EA6 <span id="font-stroke-val">1</span>px</label>
+          <input type="range" id="font-stroke-slider" min="0" max="3" value="1" step="0.5">
+        </div>
+        <button class="font-reset-btn">\u6062\u590D\u9ED8\u8BA4</button>
+        <button class="font-close-btn">\u5173\u95ED</button>
+      </div>`;
+      return modal;
+    }
+    bindEvents() {
+      const overlay = this.el.querySelector(".font-overlay");
+      const closeBtn = this.el.querySelector(".font-close-btn");
+      const resetBtn = this.el.querySelector(".font-reset-btn");
+      overlay.addEventListener("click", () => this.close());
+      closeBtn.addEventListener("click", () => this.close());
+      resetBtn.addEventListener("click", () => this.reset());
+      this.bindSlider("font-size-slider", "font-size-val", "size");
+      this.bindSlider("font-glow-slider", "font-glow-val", "glowIntensity");
+      this.bindSlider("font-stroke-slider", "font-stroke-val", "strokeWidth");
+      this.bindColor("font-color-picker", "textColor");
+      this.bindColor("font-glow-picker", "glowColor");
+      this.applySettings();
+    }
+    bindSlider(sliderId, valId, key) {
+      const slider = this.el.querySelector(`#${sliderId}`);
+      const label = this.el.querySelector(`#${valId}`);
+      slider.addEventListener("input", () => {
+        const v = parseFloat(slider.value);
+        label.textContent = String(v);
+        this.settings[key] = v;
+        this.applySettings();
+      });
+    }
+    bindColor(pickerId, key) {
+      const picker = this.el.querySelector(`#${pickerId}`);
+      picker.addEventListener("input", () => {
+        this.settings[key] = picker.value;
+        this.applySettings();
+      });
+    }
+    applySettings() {
+      const preview = this.el.querySelector("#font-preview-text");
+      const s = this.settings;
+      preview.style.fontSize = s.size + "px";
+      preview.style.color = s.textColor;
+      const glowSpread = s.glowIntensity * 0.3;
+      const glowAlpha = s.glowIntensity / 100;
+      preview.style.textShadow = [
+        `0 0 ${glowSpread}px ${s.glowColor}`,
+        `0 0 ${glowSpread * 2}px ${hexToRgba(s.glowColor, glowAlpha)}`,
+        `1px 1px 0 rgba(0,0,0,0.8)`,
+        `-1px -1px 0 rgba(0,0,0,0.8)`,
+        `1px -1px 0 rgba(0,0,0,0.8)`,
+        `-1px 1px 0 rgba(0,0,0,0.8)`
+      ].join(", ");
+      preview.style.webkitTextStroke = `${s.strokeWidth}px rgba(0,0,0,0.6)`;
+      this.onChange({ ...this.settings });
+    }
+    reset() {
+      this.settings = { ...DEFAULT_FONT_SETTINGS };
+      this.syncControls();
+      this.applySettings();
+    }
+    syncControls() {
+      const s = this.settings;
+      this.el.querySelector("#font-size-slider").value = String(s.size);
+      this.el.querySelector("#font-size-val").textContent = String(s.size);
+      this.el.querySelector("#font-glow-slider").value = String(s.glowIntensity);
+      this.el.querySelector("#font-glow-val").textContent = String(s.glowIntensity);
+      this.el.querySelector("#font-stroke-slider").value = String(s.strokeWidth);
+      this.el.querySelector("#font-stroke-val").textContent = String(s.strokeWidth);
+      this.el.querySelector("#font-color-picker").value = s.textColor;
+      this.el.querySelector("#font-glow-picker").value = s.glowColor;
+    }
+    open() {
+      document.body.appendChild(this.el);
+      requestAnimationFrame(() => this.el.classList.add("open"));
+    }
+    close() {
+      this.el.classList.remove("open");
+      setTimeout(() => this.el.remove(), 300);
+    }
+  };
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // src/keyword-activator/ui/MainModal.ts
+  var MainModal = class {
+    constructor(fontSettings) {
+      this.entries = [];
+      this.categories = [];
+      this.activeCategory = "\u5168\u90E8";
+      this.searchQuery = "";
+      this.fontSettings = fontSettings;
+      this.detailModal = new DetailModal(fontSettings);
+      this.el = this.create();
+      this.fontModal = new FontSettingsModal(fontSettings, (s) => {
+        this.fontSettings = s;
+        this.detailModal.updateFontSettings(s);
+        this.applyFontToAllCards();
+      });
+      this.bindEvents();
+    }
+    create() {
+      const modal = document.createElement("div");
+      modal.id = "main-modal";
+      modal.className = "glass-heavy";
+      modal.innerHTML = `
+      <div class="modal-header">
+        <span class="modal-title text-art">\u5492\u672F\u56DE\u6218 \xB7 \u5173\u952E\u8BCD\u6FC0\u6D3B</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="font-open-btn" title="\u5B57\u4F53\u8BBE\u7F6E" style="
+            width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);
+            background:rgba(255,255,255,0.06);color:var(--text-secondary);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;font-size:14px;
+          ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <text x="2" y="18" font-size="16" fill="currentColor" stroke="none">\u5B57</text>
+            </svg>
+          </button>
+          <button class="modal-close-btn" title="\u6536\u8D77" aria-label="\u6536\u8D77" style="
+            width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);
+            background:rgba(255,255,255,0.06);color:var(--text-secondary);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrapper" style="position:relative">
+          <input type="text" id="search-input" placeholder="\u641C\u7D22\u672F\u5F0F\u6216\u5173\u952E\u8BCD\u2026" autocomplete="off">
+          <button class="search-clear" id="search-clear">\u2715</button>
+        </div>
+      </div>
+      <div class="category-tabs" id="category-tabs"></div>
+      <div class="entry-list" id="entry-list">
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <div class="empty-text">\u52A0\u8F7D\u4E2D\u2026</div>
+        </div>
+      </div>`;
+      return modal;
+    }
+    bindEvents() {
+      const searchInput = this.el.querySelector("#search-input");
+      const searchClear = this.el.querySelector("#search-clear");
+      const fontBtn = this.el.querySelector(".font-open-btn");
+      const closeBtn = this.el.querySelector(".modal-close-btn");
+      searchInput.addEventListener("input", () => {
+        this.searchQuery = searchInput.value;
+        searchClear.classList.toggle("visible", this.searchQuery.length > 0);
+        this.renderEntries();
+      });
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        this.searchQuery = "";
+        searchClear.classList.remove("visible");
+        this.renderEntries();
+        searchInput.focus();
+      });
+      fontBtn.addEventListener("click", () => this.fontModal.open());
+      closeBtn.addEventListener("click", () => this.onClose?.());
+    }
+    setCloseHandler(fn) {
+      this.onClose = fn;
+    }
+    async loadData() {
+      this.entries = await loadKeywordIndex();
+      this.categories = getCategories(this.entries);
+      this.renderTabs();
+      this.renderEntries();
+      scheduleEmbedHeightSync(this.isOpen);
+    }
+    renderTabs() {
+      const tabsEl = this.el.querySelector("#category-tabs");
+      tabsEl.innerHTML = "";
+      const allTab = this.createTab("\u5168\u90E8", this.entries.length);
+      allTab.classList.add("active");
+      tabsEl.appendChild(allTab);
+      for (const cat of this.categories) {
+        tabsEl.appendChild(this.createTab(cat.name, cat.count));
+      }
+    }
+    createTab(name, count) {
+      const tab = document.createElement("button");
+      tab.className = "category-tab";
+      tab.textContent = `${name} (${count})`;
+      tab.addEventListener("click", () => {
+        this.activeCategory = name;
+        this.el.querySelectorAll(".category-tab").forEach(
+          (t) => t.classList.toggle("active", t === tab)
+        );
+        this.renderEntries();
+      });
+      return tab;
+    }
+    renderEntries() {
+      const listEl = this.el.querySelector("#entry-list");
+      const results = sortByRarity(
+        searchEntries(this.entries, this.searchQuery, this.activeCategory)
+      );
+      if (results.length === 0) {
+        listEl.innerHTML = `
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <div class="empty-text">\u65E0\u5339\u914D\u6761\u76EE<br>\u5C1D\u8BD5\u5176\u4ED6\u5173\u952E\u8BCD\u6216\u5206\u7C7B</div>
+        </div>`;
+        return;
+      }
+      listEl.innerHTML = "";
+      for (const entry of results) {
+        listEl.appendChild(this.createCard(entry));
+      }
+    }
+    createCard(entry) {
+      const card = document.createElement("div");
+      card.className = "entry-card";
+      const keysHtml = entry.keys.slice(0, 4).map(
+        (k) => `<span class="card-key-tag">${this.escapeHtml(k)}</span>`
+      ).join("") + (entry.keys.length > 4 ? `<span class="card-key-tag">+${entry.keys.length - 4}</span>` : "");
+      card.innerHTML = `
+      <div class="card-indicator ind-${entry.rarity}"></div>
+      <div class="card-info">
+        <div class="card-name rarity-${entry.rarity}">${this.escapeHtml(entry.name)}</div>
+        <div class="card-keys">${keysHtml}</div>
+      </div>
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>`;
+      card.addEventListener("click", () => this.detailModal.show(entry));
+      return card;
+    }
+    escapeHtml(s) {
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+    applyFontToAllCards() {
+      const s = this.fontSettings;
+      const cards = this.el.querySelectorAll(".card-name");
+      cards.forEach((card) => {
+        const el = card;
+        el.style.fontSize = s.size + "px";
+        el.style.color = s.textColor;
+        const gs = s.glowIntensity * 0.3;
+        el.style.textShadow = [
+          `0 0 ${gs}px ${s.glowColor}`,
+          `0 0 ${gs * 2}px ${s.glowColor}`,
+          "1px 1px 0 rgba(0,0,0,0.8)",
+          "-1px -1px 0 rgba(0,0,0,0.8)",
+          "1px -1px 0 rgba(0,0,0,0.8)",
+          "-1px 1px 0 rgba(0,0,0,0.8)"
+        ].join(", ");
+        el.style.webkitTextStroke = `${s.strokeWidth}px rgba(0,0,0,0.6)`;
+      });
+    }
+    open() {
+      applyPanelMaxHeight();
+      this.el.classList.add("open");
+      scheduleEmbedHeightSync(true);
+      if (this.entries.length === 0) this.loadData();
+    }
+    close() {
+      this.el.classList.remove("open");
+      scheduleEmbedHeightSync(false);
+    }
+    get isOpen() {
+      return this.el.classList.contains("open");
+    }
+  };
+
+  // src/keyword-activator/embed.ts
+  var lastEmbedHeight = -1;
+  var embedHeightRaf = 0;
+  function resolvePanelMaxHeight() {
+    let max = Math.floor(window.innerWidth <= 480 ? window.innerHeight * 0.85 : window.innerHeight * 0.72);
+    try {
+      const chat = window.parent?.document?.querySelector("#chat");
+      if (chat?.clientHeight) {
+        max = Math.floor(chat.clientHeight * (window.innerWidth <= 480 ? 0.85 : 0.72));
+      }
+    } catch {
+    }
+    return Math.max(320, Math.min(520, max));
+  }
+  function applyPanelMaxHeight() {
+    const maxH = resolvePanelMaxHeight();
+    document.documentElement.style.setProperty("--ka-panel-max", `${maxH}px`);
+    document.documentElement.style.setProperty("--ka-panel-height", `${maxH}px`);
+    const modal = document.getElementById("main-modal");
+    if (modal) modal.style.height = `${maxH}px`;
+  }
+  function measureEmbedHeight(expanded) {
+    if (!expanded) {
+      const collapsed = document.getElementById("ka-collapsed");
+      if (!collapsed) return 44;
+      return Math.max(44, Math.ceil(collapsed.getBoundingClientRect().height));
+    }
+    applyPanelMaxHeight();
+    const modal = document.getElementById("main-modal");
+    if (!modal) return 320;
+    return Math.ceil(modal.getBoundingClientRect().height);
+  }
+  function syncEmbedHeight(expanded) {
+    const html = document.documentElement;
+    const body = document.body;
+    html.classList.toggle("ka-folded", !expanded);
+    html.classList.toggle("ka-expanded", expanded);
+    body.classList.toggle("ka-folded", !expanded);
+    body.classList.toggle("ka-expanded", expanded);
+    const height = measureEmbedHeight(expanded);
+    if (height === lastEmbedHeight) return;
+    lastEmbedHeight = height;
+    if (expanded) {
+      html.style.height = `${height}px`;
+      body.style.height = `${height}px`;
+    } else {
+      html.style.height = "";
+      body.style.height = "";
+    }
+    try {
+      const frame = window.frameElement;
+      if (!frame) return;
+      frame.style.setProperty("height", `${height}px`, "important");
+      frame.style.background = "transparent";
+      frame.style.border = "none";
+      frame.style.display = "block";
+    } catch {
+    }
+  }
+  function scheduleEmbedHeightSync(expanded) {
+    cancelAnimationFrame(embedHeightRaf);
+    embedHeightRaf = requestAnimationFrame(() => {
+      syncEmbedHeight(expanded);
+      embedHeightRaf = 0;
+    });
+  }
+
+  // src/keyword-activator/index.ts
+  var KeywordActivator = class {
+    constructor() {
+      this.modal = new MainModal({ ...DEFAULT_FONT_SETTINGS });
+      this.modal.setCloseHandler(() => this.toggle());
+      this.collapsed = document.createElement("div");
+      this.collapsed.id = "ka-collapsed";
+      this.collapsed.setAttribute("aria-label", "展开关键词激活器");
+      this.ball = new FloatingBall(() => this.toggle());
+      this.collapsed.appendChild(this.ball.el);
+      document.body.appendChild(this.collapsed);
+      document.body.appendChild(this.modal.el);
+      document.documentElement.classList.add("ka-folded");
+      document.body.classList.add("ka-folded");
+      scheduleEmbedHeightSync(false);
+      if (typeof ResizeObserver !== "undefined") {
+        const ro = new ResizeObserver(() => scheduleEmbedHeightSync(this.modal.isOpen));
+        ro.observe(this.modal.el);
+        ro.observe(this.collapsed);
+      }
+    }
+    toggle() {
+      if (this.modal.isOpen) this.modal.close();
+      else this.modal.open();
+    }
+  };
+  function boot() {
+    new KeywordActivator();
+  }
+  if (typeof $ === "function") {
+    $(typeof errorCatched === "function" ? errorCatched(boot) : boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

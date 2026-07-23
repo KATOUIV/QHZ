@@ -1,0 +1,1942 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>抗日战争 · 沙盒开局</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --khaki: #8a8256;
+    --khaki-deep: #6b6440;
+    --khaki-pale: #cabf98;
+    --cream: #f1e8cf;
+    --cream-deep: #e4d7ac;
+    --iron-red: #8c3a2e;
+    --iron-red-deep: #6b2a20;
+    --ink: #2c2620;
+    --ink-soft: #4a4234;
+    --ink-faint: #7a7160;
+    --line: rgba(44, 38, 32, 0.16);
+    --card-bg: rgba(255, 251, 240, 0.78);
+    --card-border: rgba(107, 100, 64, 0.28);
+    --shadow: 0 8px 26px rgba(40, 32, 20, 0.26);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: 'Noto Serif SC', 'STSong', 'SimSun', serif;
+    color: var(--ink);
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+    overscroll-behavior: contain;
+  }
+
+  body {
+    background:
+      repeating-linear-gradient(135deg, rgba(44, 38, 32, 0.045) 0 1px, transparent 1px 6px),
+      radial-gradient(ellipse at top, rgba(255, 255, 255, 0.35), transparent 60%),
+      linear-gradient(165deg, var(--cream) 0%, var(--cream-deep) 55%, var(--khaki-pale) 100%);
+    /* 禁止 100vh：嵌入 iframe 时会与高度同步互相撑爆 */
+    min-height: 0;
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    display: flex;
+    justify-content: center;
+    /* 关键：避免预撑 iframe 时 flex 把 #war-app 纵向拉满，导致 scrollHeight≈maxH 死锁 */
+    align-items: flex-start;
+  }
+
+  #war-app {
+    width: 100%;
+    max-width: 480px;
+    align-self: flex-start;
+    flex: 0 0 auto;
+  }
+
+  .war-screen { display: none; }
+  .war-screen.active { display: block; animation: warFadeIn 0.28s ease; }
+
+  /* 选项列表在嵌入态内滚动，避免 iframe 被撑到数千 px */
+  #opt-timeline,
+  #opt-faction,
+  #faction-advanced-group,
+  #opt-clan,
+  #opt-weapon,
+  #opt-skills {
+    max-height: var(--war-opt-max, 360px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 2px;
+  }
+  @keyframes warFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ 标题屏 ============ */
+  #screen-title {
+    text-align: center;
+    padding: 22px 16px 14px;
+  }
+  .war-title-stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
+    background: var(--iron-red);
+    color: var(--cream);
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25), var(--shadow);
+    margin-bottom: 14px;
+    transform: rotate(-3deg);
+  }
+  .war-title-main {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .war-title-sub {
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--iron-red-deep);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .war-title-blurb {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    margin: 0 auto 14px;
+    max-width: 360px;
+  }
+  .war-title-meta {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+  }
+
+  /* ============ 创作标记 / 联系作者 ============ */
+  .war-credit-block {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .war-credit-seal {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px 12px;
+    border: 2px solid var(--iron-red);
+    border-radius: 2px;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+      linear-gradient(160deg, rgba(140, 58, 46, 0.12), rgba(241, 232, 207, 0.55));
+    box-shadow:
+      inset 0 0 0 1px rgba(140, 58, 46, 0.25),
+      0 4px 14px rgba(40, 32, 20, 0.12);
+    transform: rotate(-2.5deg);
+    animation: warSealIn 0.7s ease both;
+  }
+  .war-credit-seal::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(140, 58, 46, 0.45);
+    pointer-events: none;
+  }
+  .war-credit-zh {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    color: var(--iron-red-deep);
+    line-height: 1.15;
+    text-shadow:
+      0 1px 0 rgba(255, 251, 240, 0.8),
+      1px 1px 0 rgba(107, 42, 32, 0.18);
+  }
+  .war-credit-en {
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: lowercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+  @keyframes warSealIn {
+    from { opacity: 0; transform: rotate(-8deg) scale(0.92); }
+    to { opacity: 1; transform: rotate(-2.5deg) scale(1); }
+  }
+  .war-btn-contact {
+    min-height: 40px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    border-style: dashed;
+  }
+
+  .war-modal-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(44, 38, 32, 0.55);
+    backdrop-filter: blur(2px);
+    animation: warFadeIn 0.2s ease;
+  }
+  .war-modal-mask[hidden] { display: none !important; }
+  .war-modal-panel {
+    width: min(100%, 360px);
+    padding: 20px 18px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background:
+      repeating-linear-gradient(135deg, rgba(44, 38, 32, 0.04) 0 1px, transparent 1px 6px),
+      linear-gradient(165deg, var(--cream) 0%, var(--cream-deep) 70%, var(--khaki-pale) 100%);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .war-modal-panel h3 {
+    font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--iron-red-deep);
+    margin-bottom: 10px;
+  }
+  .war-modal-panel p {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .war-modal-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .war-modal-actions .war-btn { flex: 1; }
+
+  .war-era-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--iron-red-deep);
+    margin: 12px 2px 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .war-era-label:first-child { margin-top: 0; }
+  .war-title-divider {
+    width: 60%;
+    height: 1px;
+    margin: 0 auto 30px;
+    background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+  }
+  .war-title-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  /* ============ 通用按钮 ============ */
+  .war-btn {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 13px 18px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: center;
+  }
+  .war-btn:active { transform: scale(0.97); }
+  .war-btn.war-btn-primary {
+    background: linear-gradient(180deg, var(--iron-red), var(--iron-red-deep));
+    border-color: var(--iron-red-deep);
+    color: var(--cream);
+    box-shadow: var(--shadow);
+  }
+  .war-btn.war-btn-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .war-btn.war-btn-ghost {
+    background: transparent;
+  }
+  .war-btn-row {
+    display: flex;
+    gap: 10px;
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 5;
+    padding: 8px 0 2px;
+    background: linear-gradient(180deg, transparent, rgba(241, 232, 207, 0.92) 28%);
+  }
+  .war-btn-row .war-btn { flex: 1; }
+  .war-flavor {
+    margin-top: 4px;
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .war-continue-hero {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--card-border);
+    background: rgba(140, 58, 46, 0.08);
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .war-continue-hero strong {
+    color: var(--iron-red-deep);
+    font-weight: 700;
+  }
+  #screen-continue .war-panel-card {
+    max-height: var(--war-continue-max, 420px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #screen-continue .war-title-actions,
+  #screen-done .war-title-actions {
+    position: sticky;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    z-index: 4;
+    padding-top: 6px;
+    background: linear-gradient(180deg, transparent, rgba(241, 232, 207, 0.94) 30%);
+  }
+  #screen-done .war-panel-card {
+    padding-bottom: 8px;
+  }
+
+  .war-hint-text {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* ============ 卡片式面板 ============ */
+  .war-panel-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 20px 18px;
+    margin-bottom: 16px;
+  }
+  .war-panel-card::before, .war-panel-card::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(140, 58, 46, 0.32);
+    pointer-events: none;
+  }
+  .war-panel-card::before { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+  .war-panel-card::after { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+
+  .war-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .war-panel-header .war-panel-badge {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 3px;
+    background: var(--iron-red);
+    color: var(--cream);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .war-panel-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--ink);
+  }
+  .war-panel-header .war-panel-desc {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+
+  /* ============ 继续屏摘要 ============ */
+  .war-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 2px;
+    font-size: 12.5px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .war-summary-row:last-child { border-bottom: none; }
+  .war-summary-row .war-summary-label { color: var(--ink-soft); }
+  .war-summary-row .war-summary-value { font-weight: 600; color: var(--ink); text-align: right; overflow-wrap: anywhere; }
+
+  /* ============ 进度条（编制步骤） ============ */
+  #wizard-progress {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 18px;
+  }
+  #wizard-progress .war-progress-dot {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(44, 38, 32, 0.12);
+  }
+  #wizard-progress .war-progress-dot.done { background: var(--khaki); }
+  #wizard-progress .war-progress-dot.current { background: var(--iron-red); }
+
+  .war-step-title {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--iron-red-deep);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .war-step-desc {
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+
+  /* ============ 单选 / 多选卡片组 ============ */
+  .war-option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .war-option-grid.war-option-1col { grid-template-columns: 1fr; }
+  .war-option-card {
+    position: relative;
+    padding: 12px 12px;
+    min-height: 52px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .war-option-card:active { transform: scale(0.98); }
+  .war-option-card .war-option-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .war-option-card .war-option-note {
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+  .war-option-card.selected {
+    border-color: var(--iron-red);
+    background: rgba(140, 58, 46, 0.1);
+  }
+  .war-option-card.selected .war-option-name { color: var(--iron-red-deep); }
+  .war-option-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 11px;
+    color: var(--iron-red-deep);
+    font-weight: 700;
+  }
+
+  .war-advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    margin: 6px 0 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .war-advanced-toggle input { accent-color: var(--iron-red); }
+  #faction-advanced-group { display: none; }
+  #faction-advanced-group.show { display: block; }
+
+  /* ============ 表单控件 ============ */
+  .war-field { margin-bottom: 14px; }
+  .war-field label {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .war-field select, .war-field input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.55);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .war-field select:focus, .war-field input[type="text"]:focus {
+    outline: none;
+    border-color: var(--iron-red);
+  }
+
+  /* ============ 武器预设 ============ */
+  .war-weapon-card .war-option-note { margin-top: 4px; }
+
+  /* ============ 技能勾选 ============ */
+  .war-skill-check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .war-skill-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  .war-skill-check input { accent-color: var(--iron-red); width: 15px; height: 15px; flex-shrink: 0; }
+  .war-skill-check.checked {
+    border-color: var(--iron-red);
+    background: rgba(140, 58, 46, 0.08);
+    color: var(--iron-red-deep);
+    font-weight: 600;
+  }
+
+  /* ============ 确认屏 ============ */
+  .war-confirm-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 2px;
+    font-size: 13px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .war-confirm-row:last-child { border-bottom: none; }
+  .war-confirm-row .war-confirm-label { color: var(--ink-soft); flex-shrink: 0; }
+  .war-confirm-row .war-confirm-value { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+  #json-preview-wrap { display: none; margin-top: 14px; }
+  #json-preview-wrap.show { display: block; }
+  #json-preview-wrap textarea {
+    width: 100%;
+    height: 220px;
+    font-family: 'Consolas', monospace;
+    font-size: 11px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: rgba(44, 38, 32, 0.05);
+    color: var(--ink);
+    resize: vertical;
+  }
+
+  /* ============ 通知条 ============ */
+  #war-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    padding: 11px 20px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, var(--ink), var(--ink-soft));
+    color: var(--cream);
+    font-size: 12.5px;
+    letter-spacing: 1px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 999;
+    max-width: 88%;
+    text-align: center;
+    border: 1px solid var(--iron-red);
+  }
+  #war-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 420px) {
+    .war-title-main { font-size: 26px; letter-spacing: 6px; }
+    .war-title-stamp { width: 58px; height: 58px; font-size: 18px; }
+    .war-option-grid { grid-template-columns: 1fr; }
+    .war-skill-check-grid { grid-template-columns: 1fr; }
+    .war-panel-card { padding: 12px; }
+    .war-step-desc { font-size: 11px; }
+    .war-credit-zh { font-size: 22px; letter-spacing: 0.32em; text-indent: 0.32em; }
+    #screen-title { padding: 18px 12px 14px; }
+    .war-title-blurb { font-size: 12px; }
+    .war-confirm-value { overflow-wrap: anywhere; word-break: break-word; }
+    .war-option-card { min-height: 48px; }
+    .war-btn-row .war-btn { min-height: 48px; }
+  }
+  @media (max-width: 360px) {
+    .war-title-main { font-size: 22px; letter-spacing: 4px; }
+    .war-btn { font-size: 13px; min-height: 46px; }
+  }
+</style>
+</head>
+<body>
+<div id="war-app">
+
+  <!-- ============ 屏1：标题屏 ============ -->
+  <section id="screen-title" class="war-screen active">
+    <div class="war-title-stamp">抗战</div>
+    <div class="war-title-main">抗日战争</div>
+    <div class="war-title-sub">沙盒开局</div>
+    <div class="war-title-blurb">一九三一至一九四五 · 十四年烽火<br/>可编制自定义档案，或从角色卡「其他开场」进入历史节点</div>
+    <div class="war-title-divider"></div>
+    <div class="war-title-actions">
+      <button class="war-btn war-btn-primary" id="btn-goto-create">编制新档</button>
+      <button class="war-btn" id="btn-goto-continue">继续</button>
+    </div>
+    <div class="war-hint-text" id="title-hint">正在检测已有档案…</div>
+    <div class="war-title-meta" id="title-meta">开局节点加载中…</div>
+
+    <div class="war-credit-block">
+      <div class="war-credit-seal" title="创作标记">
+        <div class="war-credit-zh">勿忘国耻</div>
+        <div class="war-credit-en">design by katou</div>
+      </div>
+      <button type="button" class="war-btn war-btn-ghost war-btn-contact" id="btn-contact-author">联系作者</button>
+    </div>
+  </section>
+
+  <!-- 联系作者模态框（URL 由 AUTHOR_CONTACT_URL 配置） -->
+  <div id="war-contact-modal" class="war-modal-mask" hidden>
+    <div class="war-modal-panel" role="dialog" aria-modal="true" aria-labelledby="war-contact-title">
+      <h3 id="war-contact-title">联系作者</h3>
+      <p id="war-contact-desc">作者：katou<br/>点击下方按钮将跳转至联系链接。</p>
+      <div class="war-modal-actions">
+        <button type="button" class="war-btn" id="btn-contact-close">关 闭</button>
+        <button type="button" class="war-btn war-btn-primary" id="btn-contact-go">前 往 联 系</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 屏2：继续（已有档案摘要） ============ -->
+  <section id="screen-continue" class="war-screen">
+    <div class="war-panel-card">
+      <div class="war-panel-header">
+        <span class="war-panel-badge">档</span>
+        <div>
+          <h2>现有战况档案</h2>
+          <div class="war-panel-desc">检测到以下已存档人物信息</div>
+        </div>
+      </div>
+      <div class="war-continue-hero" id="cs-hero">正在读取战况…</div>
+      <div class="war-summary-row"><span class="war-summary-label">身份</span><span class="war-summary-value" id="cs-identity">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">军衔 / 阵营</span><span class="war-summary-value" id="cs-rank-faction">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">所属派系</span><span class="war-summary-value" id="cs-clan">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">时间</span><span class="war-summary-value" id="cs-time">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">地点</span><span class="war-summary-value" id="cs-place">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">当前位置</span><span class="war-summary-value" id="cs-pos">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">主线阶段</span><span class="war-summary-value" id="cs-stage">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">等级 / 经验</span><span class="war-summary-value" id="cs-level">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">士气 / 体力</span><span class="war-summary-value" id="cs-vitals">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">主武器</span><span class="war-summary-value" id="cs-weapon">--</span></div>
+      <div class="war-summary-row"><span class="war-summary-label">当前任务</span><span class="war-summary-value" id="cs-task">--</span></div>
+    </div>
+    <div class="war-title-actions" style="max-width:100%">
+      <button class="war-btn war-btn-primary" id="btn-continue-play">开 始 游 玩</button>
+      <button class="war-btn" id="btn-continue-recreate">重 新 编 制</button>
+      <button class="war-btn war-btn-ghost" id="btn-continue-back">返回标题</button>
+    </div>
+  </section>
+
+  <!-- ============ 屏3：编制新档（多步向导） ============ -->
+  <section id="screen-wizard" class="war-screen">
+    <div id="wizard-progress"></div>
+
+    <!-- 步骤 1：时间线起点 -->
+    <div class="war-wizard-step" data-step="1">
+      <div class="war-panel-card">
+        <div class="war-step-title">第一步 · 时间线起点</div>
+        <div class="war-step-desc">从局部抗战到全面胜利，选择开局历史节点（将决定时间、地点、主线阶段与推荐番号）</div>
+        <div id="opt-timeline"></div>
+      </div>
+    </div>
+
+    <!-- 步骤 2：阵营 -->
+    <div class="war-wizard-step" data-step="2" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第二步 · 阵营</div>
+        <div class="war-step-desc">选择你所效力的抗战力量</div>
+        <div class="war-option-grid" id="opt-faction"></div>
+        <label class="war-advanced-toggle">
+          <input type="checkbox" id="chk-show-enemy-faction" />
+          显示日军 / 伪军阵营（高级·非常规开局）
+        </label>
+        <div id="faction-advanced-group" class="war-option-grid"></div>
+      </div>
+    </div>
+
+    <!-- 步骤 3：派系 -->
+    <div class="war-wizard-step" data-step="3" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第三步 · 所属派系</div>
+        <div class="war-step-desc">若阵营为国民革命军，可进一步指定派系；其余阵营可选「无」</div>
+        <div class="war-option-grid" id="opt-clan"></div>
+      </div>
+    </div>
+
+    <!-- 步骤 4：军衔与身份 -->
+    <div class="war-wizard-step" data-step="4" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第四步 · 军衔与身份</div>
+        <div class="war-step-desc">设定初始军衔，并填写具体的部队番号与职别</div>
+        <div class="war-field">
+          <label for="input-rank">军衔</label>
+          <select id="input-rank">
+            <option>二等兵</option>
+            <option selected>一等兵</option>
+            <option>上等兵</option>
+            <option>下士</option>
+            <option>中士</option>
+            <option>上士</option>
+            <option>准尉</option>
+            <option>少尉</option>
+            <option>中尉</option>
+            <option>上尉</option>
+            <option>少校</option>
+            <option>中校</option>
+            <option>上校</option>
+            <option>少将</option>
+            <option>中将</option>
+            <option>上将</option>
+          </select>
+        </div>
+        <div class="war-field">
+          <label for="input-identity">身份（部队番号与职别）</label>
+          <input type="text" id="input-identity" placeholder="例：国民革命军第二十九军三十七师二一九团三营十一连·步兵" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 步骤 5：主武器预设 -->
+    <div class="war-wizard-step" data-step="5" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第五步 · 主武器预设</div>
+        <div class="war-step-desc">选择随身携带的制式武器</div>
+        <div class="war-option-grid war-weapon-card" id="opt-weapon"></div>
+      </div>
+    </div>
+
+    <!-- 步骤 6：作战技能 -->
+    <div class="war-wizard-step" data-step="6" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第六步 · 作战技能</div>
+        <div class="war-step-desc">勾选已具备的基础作战技能（可多选，第一项将作为作战专长）</div>
+        <div class="war-skill-check-grid" id="opt-skills"></div>
+      </div>
+    </div>
+
+    <!-- 步骤 7：确认生成 -->
+    <div class="war-wizard-step" data-step="7" style="display:none">
+      <div class="war-panel-card">
+        <div class="war-step-title">第七步 · 确认档案</div>
+        <div class="war-step-desc">核对以下信息，确认无误后生成完整战况档案</div>
+        <div class="war-confirm-row"><span class="war-confirm-label">时间线</span><span class="war-confirm-value" id="cf-timeline">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">阵营</span><span class="war-confirm-value" id="cf-faction">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">派系</span><span class="war-confirm-value" id="cf-clan">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">军衔</span><span class="war-confirm-value" id="cf-rank">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">身份</span><span class="war-confirm-value" id="cf-identity">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">武器</span><span class="war-confirm-value" id="cf-weapon">--</span></div>
+        <div class="war-confirm-row"><span class="war-confirm-label">作战技能</span><span class="war-confirm-value" id="cf-skills">--</span></div>
+      </div>
+    </div>
+
+    <div class="war-btn-row">
+      <button class="war-btn" id="btn-wizard-prev">上一步</button>
+      <button class="war-btn war-btn-primary" id="btn-wizard-next">下一步</button>
+    </div>
+  </section>
+
+  <!-- ============ 屏4：完成 ============ -->
+  <section id="screen-done" class="war-screen">
+    <div class="war-panel-card" style="text-align:center">
+      <div class="war-panel-header" style="justify-content:center">
+        <span class="war-panel-badge">✓</span>
+        <div>
+          <h2>档案已生成</h2>
+          <div class="war-panel-desc" id="done-status-text">战况档案写入完成</div>
+        </div>
+      </div>
+      <div class="war-continue-hero" id="done-opening-preview">开局摘要将显示于此</div>
+      <div id="json-preview-wrap">
+        <textarea id="json-preview" readonly></textarea>
+      </div>
+    </div>
+    <div class="war-title-actions" style="max-width:100%">
+      <button class="war-btn war-btn-primary" id="btn-start-game">开 始 游 戏</button>
+      <button class="war-btn war-btn-ghost" id="btn-done-back">返回标题</button>
+    </div>
+  </section>
+
+</div>
+
+<div id="war-toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /**
+   * 联系作者跳转链接（稍后填入完整 URL，例如 https://...）
+   * 为空时模态框可打开，但「前往联系」会提示链接待公布。
+   */
+  const AUTHOR_CONTACT_URL = 'https://discord.com/channels/1380075940285124724/1529768841872281620';
+
+  /* ============ 时间线预设（世界.当前时间/当前地点/主线阶段） ============ */
+  const TIMELINE_ERAS = [
+    { id: 'local', title: '局部抗战 · 1931-1936' },
+    { id: 'outbreak', title: '全面爆发 · 1937-1938' },
+    { id: 'stalemate', title: '战略相持 · 1939-1943' },
+    { id: 'counter', title: '反攻与终局 · 1944-1945' },
+  ];
+
+  const TIMELINES = {
+    B: {
+      key: 'B', era: 'local', label: '九一八事变', note: '1931.9 · 奉天北大营 · 局部抗战开端',
+      flavor: '夜色里南满铁路先闷响一声，北大营的刺刀冷光随即涌来。',
+      time: '1931年9月18日 22:20', place: '【奉天（沈阳）·北大营附近】', stage: '事件B_九一八事变',
+      zone: '东北战区', base: '【奉天·北大营·东北军驻地】', task: '【判明敌情并守住营门】',
+      tasks: { 戒备日军动向: '南满铁路炸响后枪火四起，北大营陷入混乱，各部急寻军令' },
+      squad: { 驻防班: { 描述: '北大营驻防班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '东北军', rank: '一等兵', identity: '东北军第七旅驻北大营步兵' },
+    },
+    B2: {
+      key: 'B2', era: 'local', label: '一二八淞沪抗战', note: '1932.1 · 上海闸北 · 十九路军抵抗',
+      flavor: '闸北街垒后，硝烟与河泥混在一起，十九路军的刺刀已经出鞘。',
+      time: '1932年1月28日 23:30', place: '【上海·闸北·街垒阵地】', stage: '事件B2_一二八淞沪抗战',
+      zone: '淞沪战区', base: '【上海·十九路军临时驻地】', task: '【守住闸北防线】',
+      tasks: { 固守闸北: '日军进攻闸北，第十九路军各部进入巷战' },
+      squad: { 巷战班: { 描述: '闸北巷战班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '无', rank: '一等兵', identity: '第十九路军闸北守备步兵' },
+    },
+    B4: {
+      key: 'B4', era: 'local', label: '西安事变前夜', note: '1936.12 · 西安 · 统一战线转折前',
+      flavor: '临潼外围的冬夜格外静，谁也不敢大声猜明天的军令。',
+      time: '1936年12月11日 21:00', place: '【陕西·西安·临潼行营外围】', stage: '事件B4_华北事变',
+      zone: '西北战区', base: '【西安·东北军驻地】', task: '【警戒行营并待命】',
+      tasks: { 警戒行营: '城内风声鹤唳，各部奉命加强警戒，无人说得清明天会发生什么' },
+      squad: { 警戒班: { 描述: '行营外围警戒班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '东北军', rank: '上等兵', identity: '东北军驻西安警戒部队上等兵' },
+    },
+    C: {
+      key: 'C', era: 'outbreak', label: '七七事变', note: '1937.7 · 卢沟桥 · 全面抗战爆发',
+      flavor: '宛平城墙上沙袋沾着露水，桥对面开始有人喊“失踪士兵”。',
+      time: '1937年7月7日 04:00', place: '【北平·宛平城外·卢沟桥附近阵地】', stage: '事件C_七七事变',
+      zone: '冀察战区', base: '【北平·宛平城·二十九军三十七师驻地】', task: '【加强宛平城防务】',
+      tasks: { 修筑防御工事: '日军借口搜城，宛平城墙上沙袋沾着露水，弟兄们已上好刺刀' },
+      squad: { 十一连第三班: { 描述: '二一九团三营十一连第三班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '西北军', rank: '一等兵', identity: '国民革命军第二十九军三十七师二一九团三营十一连·步兵' },
+    },
+    C2: {
+      key: 'C2', era: 'outbreak', label: '淞沪会战', note: '1937.8 · 上海闸北 · 精锐巷战',
+      flavor: '苏州河沿线的街垒像被机枪啄过的蜂窝，钢盔还带着出厂的新漆。',
+      time: '1937年8月20日 09:00', place: '【上海·闸北·街垒阵地】', stage: '事件C2_淞沪会战',
+      zone: '淞沪战区', base: '【上海·苏州河沿线临时营地】', task: '【固守街垒并配合友军推进】',
+      tasks: { 巷战推进: '中央军精锐投入闸北，街垒后机枪与硝烟终日不停' },
+      squad: { 街垒班: { 描述: '闸北街垒作战班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '上等兵', identity: '国民革命军中央军精锐步兵连·上等兵' },
+    },
+    C4: {
+      key: 'C4', era: 'outbreak', label: '南京保卫战', note: '1937.12 · 紫金山外 · 卫戍危局',
+      flavor: '紫金山外炮声不断，城门附近的地图与饭盒散了一地。',
+      time: '1937年12月10日 16:00', place: '【南京·紫金山外沿阵地】', stage: '事件C4_南京保卫战',
+      zone: '京沪战区', base: '【南京·卫戍司令部附近驻地】', task: '【补防城垣缺口】',
+      tasks: { 补防城垣: '外围防线不稳，城门附近军民混杂，缺口急需人手' },
+      squad: { 补防班: { 描述: '城垣补防班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '中士', identity: '南京卫戍部队步兵班长' },
+    },
+    D: {
+      key: 'D', era: 'outbreak', label: '台儿庄战役', note: '1938.3 · 徐州外线 · 首次大捷',
+      flavor: '麦田被炮弹犁开，坦克履带轧过石子路，庄墙上写着共存亡。',
+      time: '1938年3月24日 06:00', place: '【山东·台儿庄外围阵地】', stage: '事件D_台儿庄战役',
+      zone: '徐州战区', base: '【台儿庄·外围守备阵地】', task: '【向前沿运送弹药并协助死守】',
+      tasks: { 坚守外围阵地: '濑谷支队坦克轧过石子路，第五战区各部咬住防线不退' },
+      squad: { 守备排: { 描述: '台儿庄外围守备排', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '桂军', rank: '一等兵', identity: '第五战区步兵连弹药手' },
+    },
+    D2: {
+      key: 'D2', era: 'outbreak', label: '武汉会战', note: '1938.8 · 武汉外围 · 最大规模会战',
+      flavor: '江雾未散，新兵刚下火车，山岭上要连夜挖出一条能活命的壕。',
+      time: '1938年8月15日 14:00', place: '【湖北·武汉外围山地阵地】', stage: '事件D2_武汉会战',
+      zone: '武汉战区', base: '【武汉外围·临时营地】', task: '【进入指定山岭构筑防御】',
+      tasks: { 构筑山岭阵地: '新兵刚下火车，长江江雾未散，山岭上要连夜挖壕' },
+      squad: { 工兵协同班: { 描述: '山岭构筑班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '上等兵', identity: '第九战区步兵连上等兵' },
+    },
+    E: {
+      key: 'E', era: 'stalemate', label: '百团大战', note: '1940.8 · 正太铁路 · 敌后破袭',
+      flavor: '正太线上狗吠被按住，剪线钳与炸药包在夜里发出细响。',
+      time: '1940年8月20日 23:30', place: '【山西·正太铁路沿线破袭点】', stage: '事件E_百团大战',
+      zone: '晋察冀战区', base: '【敌后根据地·临时驻地】', task: '【破袭铁路并撤离】',
+      tasks: { 破袭正太线: '剪线钳与炸药包已分发，天亮前铁轨必须断开' },
+      squad: { 破袭组: { 描述: '铁路破袭组', 状态: '在编' } },
+      suggest: { faction: '八路军', clan: '无', rank: '上等兵', identity: '八路军破袭队战士' },
+    },
+    E4: {
+      key: 'E4', era: 'stalemate', label: '第三次长沙会战', note: '1941.12 · 长沙城下 · 天炉战法',
+      flavor: '天炉阵一层层收紧，长沙城下的反包围号令还压在电话线里。',
+      time: '1941年12月31日 07:00', place: '【湖南·长沙外围阵地】', stage: '事件E4_第三次长沙会战',
+      zone: '第九战区', base: '【长沙·外围守备阵地】', task: '【按梯次阻击并准备反包围】',
+      tasks: { 执行天炉战法: '日军逼近城下，各部按预定阵地层层阻击，等待反包围号令' },
+      squad: { 阻击班: { 描述: '长沙外围阻击班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '上等兵', identity: '第九战区长沙守备步兵' },
+    },
+    F: {
+      key: 'F', era: 'stalemate', label: '远征军入缅', note: '1942.3 · 同古 · 出国远征',
+      flavor: '同古的雨水泡烂公路，棕榈树下第一次听见回国路可能被切断。',
+      time: '1942年3月18日 08:00', place: '【缅甸·同古（东瓜）附近】', stage: '事件F_中国远征军入缅',
+      zone: '滇缅战区', base: '【同古·远征军前进营地】', task: '【协防同古，掩护主力集结】',
+      tasks: { 协防同古: '热带暴雨泡烂公路，第200师接防，侦察机已在树梢掠过' },
+      squad: { 远征班: { 描述: '同古协防班', 状态: '在编' } },
+      suggest: { faction: '中国远征军', clan: '中央军', rank: '一等兵', identity: '中国远征军第200师步兵' },
+    },
+    F4: {
+      key: 'F4', era: 'counter', label: '滇西反攻', note: '1944.6 · 怒江松山 · 打通中印路',
+      flavor: '怒江被炮弹打出白雾，松山像钉子钉在对岸的骨头上。',
+      time: '1944年6月10日 05:00', place: '【云南·怒江东岸·松山对岸集结地】', stage: '事件F4_滇西缅北反攻',
+      zone: '滇西战区', base: '【滇西·远征军前进营地】', task: '【强渡怒江，参与松山攻坚】',
+      tasks: { 强渡怒江: '炮弹在江面打出白雾，徒涉点一夜一夜地试，松山仍像钉子钉在对岸' },
+      squad: { 渡江突击组: { 描述: '怒江渡江突击组', 状态: '在编' } },
+      suggest: { faction: '中国远征军', clan: '中央军', rank: '下士', identity: '中国远征军滇西反攻部队下士' },
+    },
+    G: {
+      key: 'G', era: 'counter', label: '衡阳保卫战', note: '1944.7 · 衡阳城垣 · 豫湘桂苦战',
+      flavor: '衡阳城垣缺口填了又塌，劝降的汉语从城外飘进来。',
+      time: '1944年7月20日 10:00', place: '【湖南·衡阳城垣缺口】', stage: '事件G_豫湘桂会战',
+      zone: '湘桂战区', base: '【衡阳·第十军城内驻地】', task: '【死守城垣缺口】',
+      tasks: { 死守缺口: '水源将断，城墙缺口填了又塌，劝降声从城外飘进来' },
+      squad: { 城垣火力组: { 描述: '城垣机枪火力组', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '中士', identity: '第十军衡阳守城部队中士' },
+    },
+    G4: {
+      key: 'G4', era: 'counter', label: '日本投降前夕', note: '1945.7 · 湘西芷江 · 最后反攻',
+      flavor: '芷江整补点的钢盔扣在膝头，有人第一次认真问战争会不会结束。',
+      time: '1945年7月20日 09:00', place: '【湘西·芷江附近阵地】', stage: '事件G4_日本投降前夕',
+      zone: '湘西战区', base: '【芷江·前进指挥所附近驻地】', task: '【参与湘西会战最后反攻】',
+      tasks: { 参与最后反攻: '日军攻势已现颓势，整补点里有人第一次问战争是否真要结束' },
+      squad: { 反攻班: { 描述: '湘西反攻突击班', 状态: '在编' } },
+      suggest: { faction: '国民革命军', clan: '中央军', rank: '上士', identity: '第四方面军步兵连上士' },
+    },
+  };
+
+  /* ============ 阵营（常规 + 高级） ============ */
+  const FACTIONS_NORMAL = [
+    { key: '国民革命军', note: '正规军·抗战主力' },
+    { key: '八路军', note: '敌后·华北抗日根据地' },
+    { key: '新四军', note: '敌后·华中抗日根据地' },
+    { key: '游击队', note: '地方武装·敌后袭扰' },
+    { key: '中国远征军', note: '滇缅·协同盟军作战' },
+  ];
+  const FACTIONS_ADVANCED = [
+    { key: '伪军', note: '高级·非常规开局' },
+    { key: '日军', note: '高级·非常规开局' },
+  ];
+
+  /* ============ 派系 ============ */
+  const CLANS = ['中央军', '西北军', '晋绥军', '东北军', '川军', '桂军', '滇军', '无'];
+
+  /* ============ 主武器预设 ============ */
+  const WEAPONS = {
+    中正式步枪: { name: '中正式步枪', type: '栓动步枪', ammo: 60, note: '标准制式步枪·射程与精度均衡' },
+    汉阳造: { name: '汉阳造', type: '栓动步枪', ammo: 50, note: '老旧但可靠的国产步枪' },
+    驳壳枪: { name: '驳壳枪', type: '半自动手枪', ammo: 40, note: '近战自卫·连发迅捷' },
+    捷克式轻机枪: { name: '捷克式轻机枪', type: '轻机枪', ammo: 100, note: '火力压制·班组核心武器' },
+  };
+
+  /* ============ 作战技能库 ============ */
+  const SKILLS = {
+    步枪射击: '基本步枪瞄准与射击',
+    拼刺: '刺刀格斗基础',
+    投弹: '手榴弹投掷与掩护配合',
+    侦察: '战场侦察与敌情观察',
+    通讯: '战场通讯联络与旗语',
+    工事构筑: '战壕与掩体构筑基础',
+    战场急救: '战场简易包扎与伤员搬运',
+    机枪操作: '轻机枪装填与压制射击',
+  };
+
+  /* ============ 默认行囊 ============ */
+  const DEFAULT_INVENTORY = {
+    急救包: { 描述: '简易包扎材料', 数量: 1 },
+    干粮袋: { 描述: '三日份干粮', 数量: 1 },
+    水壶: { 描述: '铝制军用水壶', 数量: 1 },
+    家信: { 描述: '家中来信', 数量: 1 },
+  };
+
+  /* ============ 工具函数 ============ */
+  function get(obj, path, fallback) {
+    if (obj == null) return fallback;
+    const keys = String(path).split('.');
+    let cur = obj;
+    for (const k of keys) {
+      if (cur == null || typeof cur !== 'object' || !(k in cur)) return fallback;
+      cur = cur[k];
+    }
+    return cur === undefined ? fallback : cur;
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('war-toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  function switchScreen(id) {
+    document.querySelectorAll('.war-screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    /* 切屏后立即同步高度，动画结束后再校一次 */
+    syncEmbedHeightNow();
+    setTimeout(() => syncEmbedHeightNow(), 320);
+  }
+
+  /* ============ 读取已有存档（用于「继续」屏与标题提示） ============ */
+  function isValidStat(stat) {
+    return !!(stat && typeof stat === 'object' && (stat['世界'] || stat['玩家']));
+  }
+
+  async function getStatData() {
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
+        const d = await Mvu.getMvuData({ type: 'message', message_id: 'latest' });
+        const stat = d?.stat_data;
+        if (isValidStat(stat)) return stat;
+      }
+    } catch (e) {
+      console.warn('[抗战首页] 读取 Mvu 数据失败', e);
+    }
+    try {
+      if (typeof getVariables === 'function') {
+        const v = getVariables({ type: 'message', message_id: 'latest' });
+        if (isValidStat(v?.stat_data)) return v.stat_data;
+      }
+    } catch (e) {
+      console.warn('[抗战首页] 读取酒馆变量失败', e);
+    }
+    return isValidStat(window.__ST_MOCK_STAT__) ? window.__ST_MOCK_STAT__ : null;
+  }
+
+  let existingStat = null;
+
+  async function checkExistingArchive() {
+    const hint = document.getElementById('title-hint');
+    const continueBtn = document.getElementById('btn-goto-continue');
+    existingStat = await getStatData();
+    if (existingStat && Object.keys(existingStat).length) {
+      if (hint) hint.textContent = '检测到已有战况档案，可选择继续或重新编制';
+      if (continueBtn) continueBtn.classList.remove('war-btn-disabled');
+    } else {
+      if (hint) hint.textContent = '未检测到已有档案，请编制新档开始沙盒开局';
+      if (continueBtn) continueBtn.classList.add('war-btn-disabled');
+    }
+  }
+
+  function renderContinueScreen() {
+    if (!existingStat) return;
+    const player = get(existingStat, '玩家', {});
+    const world = get(existingStat, '世界', {});
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('cs-identity', get(player, '身份', '--'));
+    set('cs-rank-faction', get(player, '军衔', '--') + ' · ' + get(player, '阵营', '--'));
+    set('cs-clan', get(player, '所属派系', '无'));
+    set('cs-time', get(world, '当前时间', '--'));
+    set('cs-place', get(world, '当前地点', '--'));
+    set('cs-pos', get(player, '当前位置', '--'));
+    set('cs-stage', get(world, '主线阶段', '--'));
+    set('cs-level', 'Lv.' + get(player, '等级', '--') + ' / EXP ' + get(player, '经验值', '--'));
+    set('cs-vitals', '士气 ' + get(player, '士气', '--') + ' · 体力 ' + get(player, '体力', '--') + '/' + get(player, '体力上限', '--'));
+    set('cs-weapon', get(player, '武器装备.名称', '--') + '（弹药' + get(player, '武器装备.弹药', 0) + '）');
+    set('cs-task', get(player, '当前任务', '无'));
+    const hero = document.getElementById('cs-hero');
+    if (hero) {
+      hero.innerHTML = '<strong>' + get(world, '主线阶段', '未知阶段') + '</strong> · ' +
+        get(world, '当前时间', '') + '<br/>' + get(player, '军衔', '') + ' · ' + get(player, '当前位置', '');
+    }
+  }
+
+  /* ============ 向导状态 ============ */
+  const wizardState = {
+    timeline: 'C',
+    faction: '国民革命军',
+    clan: '西北军',
+    rank: '一等兵',
+    identity: '',
+    weapon: '中正式步枪',
+    skills: ['步枪射击'],
+  };
+
+  const TOTAL_STEPS = 7;
+  let currentStep = 1;
+
+  function buildOptionCard(container, key, label, note, groupName, flavor) {
+    const card = document.createElement('div');
+    card.className = 'war-option-card';
+    card.dataset.value = key;
+    card.dataset.group = groupName;
+    card.innerHTML = `<div class="war-option-name">${label}</div>${note ? `<div class="war-option-note">${note}</div>` : ''}${flavor ? `<div class="war-flavor">${flavor}</div>` : ''}`;
+    container.appendChild(card);
+    return card;
+  }
+
+  function applyTimelineSuggest(t) {
+    if (!t || !t.suggest) return;
+    wizardState.faction = t.suggest.faction || wizardState.faction;
+    wizardState.clan = t.suggest.clan || wizardState.clan;
+    wizardState.rank = t.suggest.rank || wizardState.rank;
+    wizardState.identity = t.suggest.identity || '';
+    const rankEl = document.getElementById('input-rank');
+    const idEl = document.getElementById('input-identity');
+    if (rankEl) rankEl.value = wizardState.rank;
+    if (idEl) idEl.value = wizardState.identity;
+  }
+
+  function initTimelineOptions() {
+    const container = document.getElementById('opt-timeline');
+    container.innerHTML = '';
+    TIMELINE_ERAS.forEach(era => {
+      const items = Object.values(TIMELINES).filter(t => t.era === era.id);
+      if (!items.length) return;
+      const label = document.createElement('div');
+      label.className = 'war-era-label';
+      label.textContent = era.title;
+      container.appendChild(label);
+      const grid = document.createElement('div');
+      grid.className = 'war-option-grid war-option-1col';
+      items.forEach(t => {
+        const card = buildOptionCard(grid, t.key, t.label, t.note, 'timeline', t.flavor);
+        card.addEventListener('click', () => {
+          wizardState.timeline = t.key;
+          applyTimelineSuggest(t);
+          refreshSelection(container, t.key);
+        });
+      });
+      container.appendChild(grid);
+    });
+    refreshSelection(container, wizardState.timeline);
+    applyTimelineSuggest(TIMELINES[wizardState.timeline]);
+    const meta = document.getElementById('title-meta');
+    if (meta) {
+      meta.textContent = `编制可选 ${Object.keys(TIMELINES).length} 个历史节点 · 角色卡「其他开场」另有 11 条场景开场白`;
+    }
+  }
+
+  function initFactionOptions() {
+    const container = document.getElementById('opt-faction');
+    FACTIONS_NORMAL.forEach(f => {
+      const card = buildOptionCard(container, f.key, f.key, f.note, 'faction');
+      card.addEventListener('click', () => selectFaction(f.key));
+    });
+    const advancedContainer = document.getElementById('faction-advanced-group');
+    FACTIONS_ADVANCED.forEach(f => {
+      const card = buildOptionCard(advancedContainer, f.key, f.key, f.note, 'faction');
+      card.addEventListener('click', () => selectFaction(f.key));
+    });
+    refreshSelection(container, wizardState.faction);
+    refreshSelection(advancedContainer, wizardState.faction);
+
+    document.getElementById('chk-show-enemy-faction').addEventListener('change', e => {
+      advancedContainer.classList.toggle('show', e.target.checked);
+    });
+  }
+
+  function selectFaction(key) {
+    wizardState.faction = key;
+    if (key !== '国民革命军' && CLANS.includes(wizardState.clan) && wizardState.clan !== '无') {
+      wizardState.clan = '无';
+      const clanContainer = document.getElementById('opt-clan');
+      if (clanContainer) refreshSelection(clanContainer, wizardState.clan);
+    }
+    refreshSelection(document.getElementById('opt-faction'), key);
+    refreshSelection(document.getElementById('faction-advanced-group'), key);
+  }
+
+  function initClanOptions() {
+    const container = document.getElementById('opt-clan');
+    CLANS.forEach(c => {
+      const card = buildOptionCard(container, c, c, '', 'clan');
+      card.addEventListener('click', () => {
+        wizardState.clan = c;
+        refreshSelection(container, c);
+      });
+    });
+    refreshSelection(container, wizardState.clan);
+  }
+
+  function initWeaponOptions() {
+    const container = document.getElementById('opt-weapon');
+    Object.values(WEAPONS).forEach(w => {
+      const card = buildOptionCard(container, w.name, w.name, `${w.type} · ${w.note}`, 'weapon');
+      card.addEventListener('click', () => {
+        wizardState.weapon = w.name;
+        refreshSelection(container, w.name);
+      });
+    });
+    refreshSelection(container, wizardState.weapon);
+  }
+
+  function initSkillOptions() {
+    const container = document.getElementById('opt-skills');
+    Object.keys(SKILLS).forEach(name => {
+      const label = document.createElement('label');
+      label.className = 'war-skill-check';
+      label.innerHTML = `<input type="checkbox" value="${name}" /> <span>${name}</span>`;
+      const checkbox = label.querySelector('input');
+      checkbox.checked = wizardState.skills.includes(name);
+      label.classList.toggle('checked', checkbox.checked);
+      checkbox.addEventListener('change', () => {
+        label.classList.toggle('checked', checkbox.checked);
+        if (checkbox.checked) {
+          if (!wizardState.skills.includes(name)) wizardState.skills.push(name);
+        } else {
+          wizardState.skills = wizardState.skills.filter(s => s !== name);
+        }
+      });
+      container.appendChild(label);
+    });
+  }
+
+  function refreshSelection(container, value) {
+    if (!container) return;
+    container.querySelectorAll('.war-option-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.value === value);
+    });
+  }
+
+  function renderWizardProgress() {
+    const progress = document.getElementById('wizard-progress');
+    progress.innerHTML = '';
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'war-progress-dot';
+      if (i < currentStep) dot.classList.add('done');
+      if (i === currentStep) dot.classList.add('current');
+      progress.appendChild(dot);
+    }
+  }
+
+  function renderConfirmSummary() {
+    const timeline = TIMELINES[wizardState.timeline];
+    document.getElementById('cf-timeline').textContent = timeline.label + '（' + timeline.time + '）';
+    document.getElementById('cf-faction').textContent = wizardState.faction;
+    document.getElementById('cf-clan').textContent = wizardState.clan;
+    document.getElementById('cf-rank').textContent = wizardState.rank;
+    document.getElementById('cf-identity').textContent = wizardState.identity || `${wizardState.faction}·${wizardState.rank}`;
+    document.getElementById('cf-weapon').textContent = wizardState.weapon;
+    document.getElementById('cf-skills').textContent = wizardState.skills.length ? wizardState.skills.join('、') : '无';
+  }
+
+  function goToStep(step) {
+    if (step === TOTAL_STEPS) renderConfirmSummary();
+    currentStep = Math.min(TOTAL_STEPS, Math.max(1, step));
+    document.querySelectorAll('.war-wizard-step').forEach(el => {
+      el.style.display = Number(el.dataset.step) === currentStep ? '' : 'none';
+    });
+    renderWizardProgress();
+    syncEmbedHeightNow();
+    const nextBtn = document.getElementById('btn-wizard-next');
+    const prevBtn = document.getElementById('btn-wizard-prev');
+    prevBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+    nextBtn.textContent = currentStep === TOTAL_STEPS ? '生 成 档 案' : '下一步';
+  }
+
+  function validateStep(step) {
+    if (step === 4) {
+      wizardState.rank = document.getElementById('input-rank').value;
+      wizardState.identity = document.getElementById('input-identity').value.trim();
+    }
+    return true;
+  }
+
+  function handleWizardNext() {
+    if (!validateStep(currentStep)) return;
+    if (currentStep === TOTAL_STEPS) {
+      finalizeArchive();
+      return;
+    }
+    goToStep(currentStep + 1);
+  }
+
+  function handleWizardPrev() {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  }
+
+  function pickCurrency(faction, stage) {
+    const f = String(faction || '');
+    const s = String(stage || '');
+    if (/日本|关东军|派遣军|伪军|满洲/.test(f)) return /汪|伪政府|南京伪/.test(f) ? '中储券' : '军票';
+    if (/八路|新四|根据地|边区/.test(f)) return /华中|苏北|新四军/.test(f) ? '抗币' : '边币';
+    if (/事件B[^0-9]|九一八|1931|1932|1933|1934/.test(s)) return '银元';
+    return '法币';
+  }
+
+  /* 军衔默认基础 BP（与战斗思维链：未录入时按军衔档位；已录入则战斗中不得擅自改基础BP） */
+  function rankBaseBp(rank) {
+    const map = {
+      二等兵: 20, 一等兵: 30, 上等兵: 40,
+      下士: 50, 中士: 60, 上士: 70,
+      准尉: 80, 少尉: 90, 中尉: 100, 上尉: 110,
+      少校: 120, 中校: 130, 上校: 140,
+    };
+    return map[rank] ?? 30;
+  }
+
+  /* 体力上限默认底线：100+等级×10（与 BP 同构；升级再 +Δ×10，训练可破格） */
+  function staminaCapFromLevel(level) {
+    const lv = Math.max(1, Math.floor(Number(level) || 1));
+    return 100 + lv * 10;
+  }
+
+  /* ============ 构建完整 stat_data（对齐 zod 结构） ============ */
+  function buildStatData() {
+    const timeline = TIMELINES[wizardState.timeline];
+    const weapon = WEAPONS[wizardState.weapon];
+    const skillsRecord = {};
+    wizardState.skills.forEach(name => {
+      skillsRecord[name] = { 描述: SKILLS[name] || name, 熟练度: '入门' };
+    });
+    const identity = wizardState.identity || `${wizardState.faction}·${wizardState.rank}`;
+    const baseBp = rankBaseBp(wizardState.rank);
+    const startLevel = 1;
+    const staminaCap = staminaCapFromLevel(startLevel);
+
+    return {
+      世界: {
+        当前时间: timeline.time,
+        当前地点: timeline.place,
+        主线阶段: timeline.stage,
+        叙事视角: String(wizardState.faction || '').includes('日本') || String(wizardState.faction || '').includes('伪')
+          ? '日方'
+          : '中方',
+        近期事务: { ...timeline.tasks },
+      },
+      玩家: {
+        等级: startLevel,
+        经验值: 0,
+        身份: identity,
+        军衔: wizardState.rank,
+        阵营: wizardState.faction,
+        所属派系: wizardState.clan,
+        军法状态: '无',
+        身体状况: 100,
+        身体状态描述: '健康',
+        体力: staminaCap,
+        体力上限: staminaCap,
+        伤势: '无',
+        士气: 75,
+        作战专长: wizardState.skills[0] || '无',
+        受训经历: '无',
+        特殊体质: '无',
+        专业技能: { 名称: '无', 描述: '', 掌握程度: '未掌握', 精通技能: '未掌握' },
+        歼敌战绩: 0,
+        武器装备: { 名称: weapon.name, 类型: weapon.type, 等级: '普通', 弹药: weapon.ammo, 状态: '良好' },
+        军饷: 15,
+        货币种类: pickCurrency(wizardState.faction, timeline.stage),
+        驻地: timeline.base,
+        当前任务: timeline.task,
+        当前位置: timeline.place,
+        战役经历: {},
+        行囊: JSON.parse(JSON.stringify(DEFAULT_INVENTORY)),
+        战力: {
+          作战技能: skillsRecord,
+          专业技能: {},
+          特长: {},
+          战术素养: { 防御阵型: false, 火力压制: false, 精准打击: false, 阵地构筑: false, 战场急救: false },
+          侦察能力: '目视范围约500米',
+          军令: {},
+          所属小队: JSON.parse(JSON.stringify(timeline.squad)),
+        },
+        战斗状态: { 是否战斗中: false, 当前敌人: '无', 基础BP: baseBp, 瞬时BP: baseBp, 弹药告急: false, 状态效果: {} },
+        战役任务: { 参战中: false, 战功值: 0, 当前战区: timeline.zone },
+      },
+      战斗记录: {
+        累计歼敌: 0,
+        累计完成任务: 0,
+        累计训练天数: 0,
+        精准打击次数: 0,
+        指挥能力觉醒: false,
+        精准射击掌握: false,
+        战场急救掌握: false,
+      },
+      系统日志: {},
+    };
+  }
+
+  /* ============ 写入变量 ============ */
+  let lastBuiltStat = null;
+  let startingGame = false;
+
+  function buildOpeningUserMessage(stat) {
+    const player = get(stat, '玩家', {});
+    const world = get(stat, '世界', {});
+    const weapon = get(player, '武器装备', {});
+    const lines = [
+      '【抗战沙盒·正式开局】',
+      '时间：' + get(world, '当前时间', '未知'),
+      '地点：' + get(world, '当前地点', '未知'),
+      '主线阶段：' + get(world, '主线阶段', '未知'),
+      '身份：' + get(player, '身份', '未知') + '（' + get(player, '军衔', '未知') + ' · ' + get(player, '阵营', '未知') +
+        (get(player, '所属派系', '无') !== '无' ? ' · ' + get(player, '所属派系') : '') + '）',
+      '当前位置：' + get(player, '当前位置', get(world, '当前地点', '未知')),
+      '当前任务：' + get(player, '当前任务', '无'),
+      '制式武器：' + get(weapon, '名称', '无') + '（弹药' + get(weapon, '弹药', 0) + '）',
+      '士气/体力：' + get(player, '士气', '--') + ' / ' + get(player, '体力', '--') + '/' + get(player, '体力上限', '--'),
+      '',
+      '请根据世界书与战况档案，从上述时空正式开场：先写清眼前战场环境、友邻动静与第一道军令或危机，再等待我行动。勿跳过开场，勿提前结束战斗。',
+    ];
+    return lines.join('\n');
+  }
+
+  function updateDoneOpeningPreview(stat) {
+    const el = document.getElementById('done-opening-preview');
+    if (!el || !stat) return;
+    const player = get(stat, '玩家', {});
+    const world = get(stat, '世界', {});
+    el.innerHTML =
+      '<strong>' + get(world, '主线阶段', '未知阶段') + '</strong><br/>' +
+      get(world, '当前时间', '') + ' · ' + get(world, '当前地点', '') + '<br/>' +
+      get(player, '军衔', '') + ' · ' + get(player, '身份', '');
+  }
+
+  async function buildOpeningMessageData(stat) {
+    const cloned = JSON.parse(JSON.stringify(stat));
+    let data = { stat_data: cloned };
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
+        const current = (await Mvu.getMvuData({ type: 'message', message_id: 'latest' })) || {};
+        data = Object.assign({}, current, { stat_data: cloned });
+      } else if (typeof getVariables === 'function') {
+        const current = getVariables({ type: 'message', message_id: 'latest' }) || {};
+        data = Object.assign({}, current, { stat_data: cloned });
+      }
+    } catch (e) {
+      console.warn('[抗战首页] 组装开局楼层变量失败，仅写入 stat_data', e);
+    }
+    return data;
+  }
+
+  async function writeStatToMessage(stat, message_id = 'latest') {
+    const cloned = JSON.parse(JSON.stringify(stat));
+    let written = false;
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData && Mvu.replaceMvuData) {
+        const current = (await Mvu.getMvuData({ type: 'message', message_id })) || {};
+        await Mvu.replaceMvuData(Object.assign({}, current, { stat_data: cloned }), { type: 'message', message_id });
+        written = true;
+      }
+    } catch (e) {
+      console.warn('[抗战首页] Mvu 写入楼层失败', message_id, e);
+    }
+    if (!written) {
+      try {
+        if (typeof getVariables === 'function' && typeof replaceVariables === 'function') {
+          const current = getVariables({ type: 'message', message_id }) || {};
+          replaceVariables(Object.assign({}, current, { stat_data: cloned }), { type: 'message', message_id });
+          written = true;
+        }
+      } catch (e) {
+        console.warn('[抗战首页] replaceVariables 写入楼层失败', message_id, e);
+      }
+    }
+    return written;
+  }
+
+  async function startGame(statOverride) {
+    if (startingGame) return;
+    const stat = statOverride || lastBuiltStat || existingStat || window.__ST_MOCK_STAT__ || (await getStatData());
+    if (!isValidStat(stat)) {
+      showToast('无可用战况档案，请先编制或继续已有档案');
+      return;
+    }
+
+    const opening = buildOpeningUserMessage(stat);
+    const startBtn = document.getElementById('btn-start-game');
+    const continuePlayBtn = document.getElementById('btn-continue-play');
+    startingGame = true;
+    if (startBtn) {
+      startBtn.classList.add('war-btn-disabled');
+      startBtn.textContent = '开局中…';
+    }
+    if (continuePlayBtn) {
+      continuePlayBtn.classList.add('war-btn-disabled');
+      continuePlayBtn.textContent = '开局中…';
+    }
+    showToast('正在作为你发送开局信息…');
+
+    try {
+      /* 先把档案写进当前可见楼层，立刻刷新 MVU 顶栏（避免仍显示 init 默认七七） */
+      await writeStatToMessage(stat, 0);
+      await writeStatToMessage(stat, 'latest');
+
+      if (typeof createChatMessages === 'function' && typeof triggerSlash === 'function') {
+        const data = await buildOpeningMessageData(stat);
+        console.info('[抗战首页] createChatMessages + /trigger 开局', opening.slice(0, 80));
+        await createChatMessages([{ role: 'user', message: opening, data }]);
+        /* 优先走酒馆原生生成；/trigger await 在部分环境会卡死或超时 */
+        let kicked = false;
+        try {
+          const parentST = window.parent?.SillyTavern;
+          const ctx = parentST?.getContext?.();
+          if (ctx && typeof ctx.generate === 'function') {
+            ctx.generate('normal');
+            kicked = true;
+            console.info('[抗战首页] 已调用 SillyTavern.generate(normal)');
+          }
+        } catch (e) {
+          console.warn('[抗战首页] 原生 generate 调用失败，回退 /trigger', e);
+        }
+        if (!kicked) {
+          triggerSlash('/trigger');
+          console.info('[抗战首页] 已 /trigger 触发生成');
+        }
+        showToast('开局信息已发送，等待回复…');
+        console.info('[抗战首页] 已触发生成');
+      } else if (typeof generate === 'function') {
+        console.info('[抗战首页] 回退 generate 开局', opening.slice(0, 80));
+        showToast('开局信息已发送，等待回复…');
+        /* 不等待完整生成结束，避免按钮永久卡在开局中 */
+        generate({ user_input: opening, should_stream: true }).then(() => {
+          console.info('[抗战首页] generate 开局完成');
+        }).catch(e => {
+          console.error('[抗战首页] generate 开局失败', e);
+          showToast('开局失败：' + (e?.message || String(e)));
+        });
+      } else {
+        throw new Error('当前环境无 createChatMessages / generate 接口');
+      }
+    } catch (e) {
+      console.error('[抗战首页] 开局失败', e);
+      showToast('开局失败：' + (e?.message || String(e)));
+    } finally {
+      startingGame = false;
+      if (startBtn) {
+        startBtn.classList.remove('war-btn-disabled');
+        startBtn.textContent = '开 始 游 戏';
+      }
+      if (continuePlayBtn) {
+        continuePlayBtn.classList.remove('war-btn-disabled');
+        continuePlayBtn.textContent = '开 始 游 玩';
+      }
+    }
+  }
+
+  async function finalizeArchive() {
+    const statData = buildStatData();
+    lastBuiltStat = statData;
+    const statusEl = document.getElementById('done-status-text');
+    const previewWrap = document.getElementById('json-preview-wrap');
+    const previewArea = document.getElementById('json-preview');
+
+    let written = false;
+
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData && Mvu.replaceMvuData) {
+        const current = (await Mvu.getMvuData({ type: 'message', message_id: 'latest' })) || {};
+        const merged = Object.assign({}, current, { stat_data: statData });
+        await Mvu.replaceMvuData(merged, { type: 'message', message_id: 'latest' });
+        written = true;
+        console.info('[抗战首页] 已写入 MVU 战况档案', {
+          时间: statData?.['世界']?.['当前时间'],
+          军衔: statData?.['玩家']?.['军衔'],
+        });
+      }
+    } catch (e) {
+      console.warn('[抗战首页] 通过 Mvu.replaceMvuData 写入失败', e);
+    }
+
+    if (!written) {
+      try {
+        if (typeof getVariables === 'function' && typeof replaceVariables === 'function') {
+          const current = getVariables({ type: 'message', message_id: 'latest' }) || {};
+          const merged = Object.assign({}, current, { stat_data: statData });
+          replaceVariables(merged, { type: 'message', message_id: 'latest' });
+          written = true;
+          console.info('[抗战首页] 已写入酒馆变量战况档案');
+        }
+      } catch (e) {
+        console.warn('[抗战首页] 通过 replaceVariables 写入失败', e);
+      }
+    }
+
+    window.__ST_MOCK_STAT__ = statData;
+    existingStat = statData;
+    updateDoneOpeningPreview(statData);
+
+    if (written) {
+      if (statusEl) statusEl.textContent = '战况档案已写入。点击「开始游戏」将发送开局信息并请求 AI 回复';
+      if (previewWrap) previewWrap.classList.remove('show');
+      showToast('已生成档案');
+    } else {
+      if (statusEl) statusEl.textContent = '未检测到酒馆助手写入接口（预览模式）。仍可尝试开始游戏';
+      if (previewWrap) {
+        previewWrap.classList.add('show');
+        if (previewArea) previewArea.value = JSON.stringify(statData, null, 2);
+      }
+      showToast('已生成档案（预览模式）');
+      try {
+        window.parent.postMessage({ source: 'war-homepage', type: 'archive-created', stat_data: statData }, '*');
+      } catch (e) {
+        /* 忽略跨域异常 */
+      }
+    }
+
+    switchScreen('screen-done');
+  }
+
+  /* ============ 事件绑定 ============ */
+  function openContactModal() {
+    const modal = document.getElementById('war-contact-modal');
+    const desc = document.getElementById('war-contact-desc');
+    const goBtn = document.getElementById('btn-contact-go');
+    if (!modal) return;
+    const hasUrl = !!(AUTHOR_CONTACT_URL && String(AUTHOR_CONTACT_URL).trim());
+    if (desc) {
+      desc.innerHTML = hasUrl
+        ? '作者：katou<br/>点击「前往联系」将打开作者留下的链接。'
+        : '作者：katou<br/>联系链接尚未公布，请稍后再试。';
+    }
+    if (goBtn) {
+      goBtn.classList.toggle('war-btn-disabled', !hasUrl);
+      goBtn.disabled = !hasUrl;
+    }
+    modal.hidden = false;
+    syncEmbedHeight();
+  }
+
+  function closeContactModal() {
+    const modal = document.getElementById('war-contact-modal');
+    if (modal) modal.hidden = true;
+    syncEmbedHeight();
+  }
+
+  function goContactAuthor() {
+    const url = String(AUTHOR_CONTACT_URL || '').trim();
+    if (!url) {
+      showToast('联系链接待公布');
+      return;
+    }
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      location.href = url;
+    }
+  }
+
+  function bindEvents() {
+    document.getElementById('btn-goto-create').addEventListener('click', () => {
+      currentStep = 1;
+      goToStep(1);
+      switchScreen('screen-wizard');
+    });
+
+    document.getElementById('btn-goto-continue').addEventListener('click', () => {
+      if (!existingStat) return;
+      renderContinueScreen();
+      switchScreen('screen-continue');
+    });
+
+    document.getElementById('btn-continue-play').addEventListener('click', () => {
+      startGame(existingStat);
+    });
+
+    document.getElementById('btn-continue-recreate').addEventListener('click', () => {
+      currentStep = 1;
+      goToStep(1);
+      switchScreen('screen-wizard');
+    });
+
+    document.getElementById('btn-continue-back').addEventListener('click', () => switchScreen('screen-title'));
+
+    document.getElementById('btn-wizard-next').addEventListener('click', handleWizardNext);
+    document.getElementById('btn-wizard-prev').addEventListener('click', handleWizardPrev);
+
+    document.getElementById('btn-start-game')?.addEventListener('click', () => {
+      startGame(lastBuiltStat || existingStat || window.__ST_MOCK_STAT__);
+    });
+
+    document.getElementById('btn-done-back').addEventListener('click', () => {
+      switchScreen('screen-title');
+      checkExistingArchive();
+    });
+
+    const contactBtn = document.getElementById('btn-contact-author');
+    const contactClose = document.getElementById('btn-contact-close');
+    const contactGo = document.getElementById('btn-contact-go');
+    const contactMask = document.getElementById('war-contact-modal');
+    if (contactBtn) contactBtn.addEventListener('click', openContactModal);
+    if (contactClose) contactClose.addEventListener('click', closeContactModal);
+    if (contactGo) contactGo.addEventListener('click', goContactAuthor);
+    if (contactMask) {
+      contactMask.addEventListener('click', e => {
+        if (e.target === contactMask) closeContactModal();
+      });
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeContactModal();
+    });
+  }
+
+  /* ============ 高度同步（供母页面嵌入时使用） ============ */
+  function getParentViewportSize() {
+    let h = 0;
+    let w = 0;
+    const th = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--TH-viewport-height'));
+    if (Number.isFinite(th) && th > 80) h = th;
+    try {
+      if (window.parent && window.parent !== window) {
+        if (!h) {
+          const ph = window.parent.innerHeight;
+          if (Number.isFinite(ph) && ph > 80) h = ph;
+        }
+        const pw = window.parent.innerWidth;
+        if (Number.isFinite(pw) && pw > 0) w = pw;
+      }
+    } catch (e) {
+      /* 跨域忽略 */
+    }
+    if (!h) h = Math.max(window.innerHeight || 0, 640);
+    if (!w) w = Math.max(window.innerWidth || 0, 360);
+    return { h, w };
+  }
+
+  let _heightSyncGen = 0;
+  let _moPaused = false;
+  function measureHomeContentHeight() {
+    const active = document.querySelector('.war-screen.active');
+    if (!active) return 320;
+    const bodyStyle = getComputedStyle(document.body);
+    const padY = (parseFloat(bodyStyle.paddingTop) || 0) + (parseFloat(bodyStyle.paddingBottom) || 0);
+    /* 不预撑 iframe：只读当前屏固有内容高；暂停 MO 避免测量时样式改动再次触发同步 */
+    _moPaused = true;
+    const prev = {
+      maxH: active.style.maxHeight,
+      overflow: active.style.overflow,
+      height: active.style.height,
+    };
+    try {
+      active.style.maxHeight = 'none';
+      active.style.overflow = 'visible';
+      active.style.height = 'auto';
+      void active.offsetHeight;
+      const base = Math.ceil(active.scrollHeight);
+      return Math.ceil(base + padY + 8);
+    } finally {
+      active.style.maxHeight = prev.maxH;
+      active.style.overflow = prev.overflow;
+      active.style.height = prev.height;
+      _moPaused = false;
+    }
+  }
+
+  function syncEmbedHeight() {
+    const gen = ++_heightSyncGen;
+    const run = () => {
+      if (gen !== _heightSyncGen) return;
+      const { h: parentH, w: parentW } = getParentViewportSize();
+      /* 用宽度判手机，避免矮桌面被误当成手机压矮 */
+      const phone = parentW <= 520;
+      const maxH = Math.round(phone
+        ? Math.min(Math.max(Math.floor(parentH * 0.78), 380), parentH - 96)
+        : Math.min(parentH - 24, 720));
+      const optMax = Math.round(Math.min(Math.max(parentH * (phone ? 0.32 : 0.36), phone ? 180 : 200), phone ? 280 : 340));
+
+      const active = document.querySelector('.war-screen.active');
+      const actions = active && active.querySelector('.war-title-actions, .war-btn-row');
+      const actionsH = actions ? Math.ceil(actions.getBoundingClientRect().height) + 14 : 88;
+      const continueMax = Math.max(160, Math.min(Math.round(parentH * 0.42), maxH - actionsH - 40));
+      document.documentElement.style.setProperty('--war-opt-max', optMax + 'px');
+      document.documentElement.style.setProperty('--war-continue-max', continueMax + 'px');
+      void document.body.offsetHeight;
+      if (gen !== _heightSyncGen) return;
+
+      const natural = measureHomeContentHeight();
+      if (gen !== _heightSyncGen) return;
+      const height = Math.max(280, Math.min(natural, maxH));
+      /* 标题屏含创作标记：宁可滚动也不可裁切「勿忘国耻」 */
+      const needScroll = natural > maxH + 2 || (active && active.id === 'screen-title' && natural > height + 2);
+      document.documentElement.style.overflowY = needScroll ? 'auto' : 'hidden';
+      document.body.style.overflowY = needScroll ? 'auto' : 'hidden';
+      document.documentElement.style.height = 'auto';
+      document.body.style.height = 'auto';
+
+      try {
+        const frame = window.frameElement;
+        if (frame) {
+          frame.style.setProperty('height', height + 'px', 'important');
+          frame.style.setProperty('min-height', height + 'px', 'important');
+          frame.style.setProperty('max-height', 'none', 'important');
+          frame.style.border = 'none';
+          frame.style.overflow = needScroll ? 'auto' : 'hidden';
+          frame.style.display = 'block';
+          frame.style.width = '100%';
+        }
+      } catch (e) {
+        /* 跨域时忽略 */
+      }
+      try {
+        window.parent.postMessage({ source: 'war-homepage', height: height }, '*');
+      } catch (e) {
+        /* 忽略 */
+      }
+      try {
+        window.__warHomeLastHeight = {
+          natural,
+          height,
+          maxH,
+          phone,
+          parentH,
+          parentW,
+          activeId: active && active.id,
+          activeSh: active ? active.scrollHeight : 0,
+        };
+      } catch (e) { /* ignore */ }
+    };
+    /* 双 rAF 对齐布局；同时提供同步路径供切屏后立即生效 */
+    requestAnimationFrame(() => requestAnimationFrame(run));
+  }
+
+  function syncEmbedHeightNow() {
+    ++_heightSyncGen;
+    const { h: parentH, w: parentW } = getParentViewportSize();
+    const phone = parentW <= 520;
+    const maxH = Math.round(phone
+      ? Math.min(Math.max(Math.floor(parentH * 0.78), 380), parentH - 96)
+      : Math.min(parentH - 24, 720));
+    const optMax = Math.round(Math.min(Math.max(parentH * (phone ? 0.32 : 0.36), phone ? 180 : 200), phone ? 280 : 340));
+    const active = document.querySelector('.war-screen.active');
+    const actions = active && active.querySelector('.war-title-actions, .war-btn-row');
+    const actionsH = actions ? Math.ceil(actions.getBoundingClientRect().height) + 14 : 88;
+    const continueMax = Math.max(160, Math.min(Math.round(parentH * 0.42), maxH - actionsH - 40));
+    document.documentElement.style.setProperty('--war-opt-max', optMax + 'px');
+    document.documentElement.style.setProperty('--war-continue-max', continueMax + 'px');
+    void document.body.offsetHeight;
+    const natural = measureHomeContentHeight();
+    const height = Math.max(280, Math.min(natural, maxH));
+    const needScroll = natural > maxH + 2 || (active && active.id === 'screen-title' && natural > height + 2);
+    document.documentElement.style.overflowY = needScroll ? 'auto' : 'hidden';
+    document.body.style.overflowY = needScroll ? 'auto' : 'hidden';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    try {
+      const frame = window.frameElement;
+      if (frame) {
+        frame.style.setProperty('height', height + 'px', 'important');
+        frame.style.setProperty('min-height', height + 'px', 'important');
+        frame.style.setProperty('max-height', 'none', 'important');
+        frame.style.border = 'none';
+        frame.style.overflow = needScroll ? 'auto' : 'hidden';
+        frame.style.display = 'block';
+        frame.style.width = '100%';
+      }
+    } catch (e) { /* ignore */ }
+    try {
+      window.parent.postMessage({ source: 'war-homepage', height: height }, '*');
+    } catch (e) { /* ignore */ }
+    window.__warHomeLastHeight = {
+      natural,
+      height,
+      maxH,
+      phone,
+      parentH,
+      parentW,
+      activeId: active && active.id,
+      activeSh: active ? active.scrollHeight : 0,
+    };
+    return height;
+  }
+
+  /* ============ 初始化 ============ */
+  function init() {
+    initTimelineOptions();
+    initFactionOptions();
+    initClanOptions();
+    initWeaponOptions();
+    initSkillOptions();
+    bindEvents();
+    goToStep(1);
+    checkExistingArchive();
+    window.addEventListener('resize', syncEmbedHeight);
+    let moTimer = 0;
+    new MutationObserver(() => {
+      if (_moPaused) return;
+      if (moTimer) clearTimeout(moTimer);
+      moTimer = setTimeout(() => {
+        if (_moPaused) return;
+        syncEmbedHeightNow();
+      }, 80);
+    }).observe(document.getElementById('war-app'), { attributes: true, childList: true, subtree: true });
+    syncEmbedHeightNow();
+    /* 供母页调试 / MCP 验收 */
+    window.__warHome = {
+      syncEmbedHeight,
+      syncEmbedHeightNow,
+      switchScreen,
+      startGame,
+      buildOpeningUserMessage,
+      checkExistingArchive,
+      get existingStat() { return existingStat; },
+      get lastBuiltStat() { return lastBuiltStat; },
+      set lastBuiltStat(v) { lastBuiltStat = v; },
+    };
+    console.info('[抗战首页] 沙盒开局界面加载完成');
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
